@@ -10,4 +10,21 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.mykola.schedule.LoginActivity">
 
+    <EditText
+        android:layout_centerInParent="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:text="Name"
+        android:ems="10"
+        android:id="@+id/group_name_input_field" />
+
+    <Button
+        android:onClick="onClick"
+        android:layout_below="@+id/group_name_input_field"
+        android:layout_centerHorizontal="true"
+        android:text="OK"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/button_requset" />
 </RelativeLayout>

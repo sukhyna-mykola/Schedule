@@ -1,9 +1,17 @@
 package com.mykola.schedule;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -14,24 +22,37 @@ import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
+    private EditText groupNameInputField;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        Log.d(Constants.TAG, "START");
-        new ScheduleRequset().execute("іп-62м");
+
+        groupNameInputField = (EditText) findViewById(R.id.group_name_input_field);
+
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.button_requset: {
+                String groupName = String.valueOf(groupNameInputField.getText());
+                new ScheduleRequset().execute(groupName);
+                break;
+            }
+        }
     }
 
 
-    private class ScheduleRequset extends AsyncTask<String, Void, Void> {
+    private class ScheduleRequset extends AsyncTask<String, Void, String> {
         private String groupName;
 
         @Override
-        protected Void doInBackground(String... params) {
+        protected String doInBackground(String... params) {
             groupName = params[0];
             String dataUrl = Constants.GROUPS_URL + groupName + "/lessons";
             Log.d(Constants.TAG, dataUrl);
@@ -45,6 +66,7 @@ public class LoginActivity extends AppCompatActivity {
 //               Create connection
                 url = new URL(dataUrl);
                 connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
 
                 InputStream in = connection.getInputStream();
 
@@ -52,10 +74,11 @@ public class LoginActivity extends AppCompatActivity {
                 while ((line = br.readLine()) != null) {
                     sb.append(line);
                 }
+                return String.valueOf(sb);
 
-                Log.d(Constants.TAG, String.valueOf(sb));
             } catch (Exception e) {
-                Log.d(Constants.TAG, "ERROR");
+                return null;
+            } finally {
                 if (br != null) {
                     try {
                         br.close();
@@ -66,7 +89,22 @@ public class LoginActivity extends AppCompatActivity {
                 if (connection != null)
                     connection.disconnect();
             }
-            return null;
+
+        }
+
+        @Override
+        protected void onPostExecute(String responce) {
+            if (responce != null) {
+                Log.d(Constants.TAG, responce);
+                Intent intent = new Intent();
+                intent.putExtra(Constants.JSON_RESPONCE_KEY, responce);
+                setResult(RESULT_OK, intent);
+                finish();
+            } else {
+                Log.d(Constants.TAG, "ERROR");
+            }
+
         }
     }
+
 }
