@@ -122,6 +122,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 Log.d(Constants.TAG, responce);
                 Intent intent = new Intent();
                 intent.putExtra(Constants.JSON_RESPONCE_KEY, responce);
+                intent.putExtra(Constants.GROUP_KEY,groupName);
                 setResult(RESULT_OK, intent);
                 finish();
             } else {

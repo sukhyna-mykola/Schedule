@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">Schedule</string>
     <string name="action_settings">Settings</string>
+    <string name="monday">Понеділок</string>
+    <string name="tuesday">Вівторок</string>
+    <string name="wednesday">Середа</string>
+    <string name="thursday">Червер</string>
+    <string name="friday">Пятниця</string>
+    <string name="saturday">Субота</string>
 </resources>

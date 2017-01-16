@@ -3,8 +3,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.mykola.schedule.MainActivity">
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/one_week"
         android:orderInCategory="100"
+        android:icon="@drawable/ic_looks_one_white_24dp"
         android:title="@string/action_settings"
-        app:showAsAction="never" />
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/two_week"
+        android:orderInCategory="100"
+        android:icon="@drawable/ic_looks_two_white_24dp"
+        android:title="@string/action_settings"
+        app:showAsAction="always" />
 </menu>

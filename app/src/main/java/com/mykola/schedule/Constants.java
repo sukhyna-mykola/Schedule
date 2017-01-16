@@ -10,6 +10,7 @@ public final class Constants {
     public static final String WEEK_URL = "http://api.rozklad.org.ua/v2/weeks";
     public static final String SHARED_PREFERENCES = "schedule.preferences";
     public static final String LOGIN_KEY = "LOGIN_KEY";
+    public static final String GROUP_KEY = "GROUP_KEY";
     public static final String JSON_RESPONCE_KEY = "JSON_RESPONCE_KEY";
 
     public static final String JSON_DATA = "data";
@@ -23,4 +24,13 @@ public final class Constants {
     public static final String LESSON_WEEK = "lesson_week";
 
     public static final String DAY_NUMBER_KEY =  "DAY_NUMBER_KEY";
+
+    public static final String DB_NAME = "LESSONS_TABLE";
+    public static final String TABLE_NAME = "TABLE_NAME";
+
+    public static final String INTEGER = "integer";
+    public static final String TEXT = "text";
+
+    public static final int FIRST_WEEK = 1;
+    public static final int SECOND_WEEK = 2;
 }
