@@ -63,8 +63,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             String line;
 
             try {
-//               Create connection
-                url = new URL(dataUrl);
+                //отримати номер тижня
+                url = new URL(Constants.WEEK_URL);
                 connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
 
@@ -74,6 +74,21 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 while ((line = br.readLine()) != null) {
                     sb.append(line);
                 }
+                setWeekNumber(sb);
+
+                //отримати предмети
+                sb = new StringBuilder();
+                url = new URL(dataUrl);
+                connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+
+                in = connection.getInputStream();
+
+                br = new BufferedReader(new InputStreamReader(in));
+                while ((line = br.readLine()) != null) {
+                    sb.append(line);
+                }
+
                 return String.valueOf(sb);
 
             } catch (Exception e) {
@@ -90,6 +105,15 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     connection.disconnect();
             }
 
+        }
+
+        private void setWeekNumber(StringBuilder sb) {
+            try {
+                JSONObject jsonObj = new JSONObject(String.valueOf(sb));
+                MainActivity.weekNumber = jsonObj.getInt(Constants.JSON_DATA);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
 
         @Override

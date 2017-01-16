@@ -5,22 +5,30 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TabHost;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class MainActivity extends AppCompatActivity {
 
     private SharedPreferences sPref;
-    private ArrayList<Lesson> lessons = new ArrayList<>();
+    public static ArrayList<ArrayList<Lesson>> lessons;
+    public static int weekNumber;
+
+    private PagerAdapter adapter;
+    private TabLayout tabLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +45,9 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
+
+        initLessons();
         boolean logined = checkStatusLogin();
         if (!logined) {
 
@@ -44,8 +55,10 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(this, LoginActivity.class);
             startActivityForResult(intent, 1);
         }
+        tabLayout = (TabLayout) findViewById(R.id.tab_layout);
 
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -77,7 +90,78 @@ public class MainActivity extends AppCompatActivity {
             }
             String responce = data.getStringExtra(Constants.JSON_RESPONCE_KEY);
             setStatusLogin(parseJSON(responce));
+            setViewScheme();
         }
+    }
+
+
+    private void initLessons() {
+        lessons = new ArrayList<>();
+        for (int i = 0; i < 6; i++) {
+            lessons.add(new ArrayList<Lesson>());
+
+        }
+    }
+
+    private void setViewScheme() {
+
+        for (int i = 0; i < 6; i++) {
+
+            if (lessons.get(i).size() != 0) {
+                switch (i) {
+                    case 0:
+                        tabLayout.addTab(tabLayout.newTab().setText("Понеділок"));
+                        break;
+                    case 1:
+                        tabLayout.addTab(tabLayout.newTab().setText("Вівторок"));
+                        break;
+                    case 2:
+                        tabLayout.addTab(tabLayout.newTab().setText("Середа"));
+                        break;
+                    case 3:
+                        tabLayout.addTab(tabLayout.newTab().setText("Червер"));
+                        break;
+                    case 4:
+                        tabLayout.addTab(tabLayout.newTab().setText("Пятниця"));
+                        break;
+                    case 5:
+                        tabLayout.addTab(tabLayout.newTab().setText("Субота"));
+                        break;
+                }
+            }
+        }
+
+        Iterator<ArrayList<Lesson>> iter = lessons.iterator();
+        while (iter.hasNext()) {
+            ArrayList<Lesson> element = iter.next();
+            if (element.size() == 0) {
+                iter.remove();
+            }
+        }
+        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+
+        final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
+        adapter = new PagerAdapter
+                (getSupportFragmentManager(), tabLayout.getTabCount());
+        viewPager.setAdapter(adapter);
+        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                viewPager.setCurrentItem(tab.getPosition());
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
+
     }
 
     private void setStatusLogin(boolean statusLogin) {
@@ -93,7 +177,8 @@ public class MainActivity extends AppCompatActivity {
         return sPref.getBoolean(Constants.LOGIN_KEY, false);
     }
 
-    private boolean parseJSON(String jsonStr){
+    private boolean parseJSON(String jsonStr) {
+        initLessons();
 
         try {
             JSONObject jsonObj = new JSONObject(jsonStr);
@@ -109,10 +194,12 @@ public class MainActivity extends AppCompatActivity {
                 String lessonType = lesson.getString(Constants.LESSON_TYPE);
                 String lessonRoom = lesson.getString(Constants.LESSON_ROOM);
                 String teacherName = lesson.getString(Constants.TEACHER_NAME);
+                if (weekNumber == Integer.parseInt(lessonWeek))
+                    lessons.get(Integer.parseInt(dayNumber) - 1).add(new Lesson(lessonName, lessonType, teacherName, lessonRoom,
+                            Integer.parseInt(lessonNumber), Integer.parseInt(dayNumber), Integer.parseInt(lessonWeek)));
 
-                lessons.add(new Lesson(lessonName,lessonType,teacherName,lessonRoom,
-                        Integer.parseInt(lessonNumber),Integer.parseInt(dayNumber),Integer.parseInt(lessonWeek)));
             }
+
 
             return true;
         } catch (JSONException e) {
