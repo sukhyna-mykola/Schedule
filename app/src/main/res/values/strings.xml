@@ -7,4 +7,5 @@
     <string name="thursday">Червер</string>
     <string name="friday">Пятниця</string>
     <string name="saturday">Субота</string>
+    <string name="input_group_name">Введіть назву групи</string>
 </resources>

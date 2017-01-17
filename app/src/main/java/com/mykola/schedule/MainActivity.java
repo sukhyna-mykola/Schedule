@@ -55,8 +55,9 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                setStatusLogin(false);
+                saveStatusLogin(false);
                 clearDB();
+                initLessons();
                 Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                 startActivityForResult(intent, 1);
 
@@ -85,8 +86,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         this.menu = menu;
-
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         setMenuView();
         return true;
@@ -129,8 +128,8 @@ public class MainActivity extends AppCompatActivity {
             else saveParityWeek(true);
 
             setMenuView();
-            String responce = data.getStringExtra(Constants.JSON_RESPONCE_KEY);
-            setStatusLogin(parseJSON(responce));
+            saveStatusLogin(true);
+            readDataFromDB();
             setViewScheme();
 
         }
@@ -160,19 +159,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void putDataToBD(Lesson lesson) {
-        ContentValues cv = new ContentValues();
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        cv.put(Constants.DAY_NUMBER, lesson.getDay());
-        cv.put(Constants.TEACHER_NAME, lesson.getTeatherName());
-        cv.put(Constants.LESSON_NAME, lesson.getName());
-        cv.put(Constants.LESSON_NUMBER, lesson.getNumber());
-        cv.put(Constants.LESSON_ROOM, lesson.getRoom());
-        cv.put(Constants.LESSON_TYPE, lesson.getType());
-        cv.put(Constants.LESSON_WEEK, lesson.getWeek());
 
-        db.insert(Constants.TABLE_NAME, null, cv);
-    }
 
     private void readDataFromDB() {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -261,7 +248,7 @@ public class MainActivity extends AppCompatActivity {
         adapter.notifyDataSetChanged();
     }
 
-    private void setStatusLogin(boolean statusLogin) {
+    private void saveStatusLogin(boolean statusLogin) {
         sPref = getSharedPreferences(Constants.SHARED_PREFERENCES, MODE_PRIVATE);
         SharedPreferences.Editor ed = sPref.edit();
         ed.putBoolean(Constants.LOGIN_KEY, statusLogin);
@@ -315,35 +302,5 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private boolean parseJSON(String jsonStr) {
-        initLessons();
 
-        try {
-            JSONObject jsonObj = new JSONObject(jsonStr);
-            JSONArray data = jsonObj.getJSONArray(Constants.JSON_DATA);
-            for (int i = 0; i < data.length(); i++) {
-
-                JSONObject lesson = data.getJSONObject(i);
-
-                String dayNumber = lesson.getString(Constants.DAY_NUMBER);
-                String lessonNumber = lesson.getString(Constants.LESSON_NUMBER);
-                String lessonWeek = lesson.getString(Constants.LESSON_WEEK);
-                String lessonName = lesson.getString(Constants.LESSON_NAME);
-                String lessonType = lesson.getString(Constants.LESSON_TYPE);
-                String lessonRoom = lesson.getString(Constants.LESSON_ROOM);
-                String teacherName = lesson.getString(Constants.TEACHER_NAME);
-                Lesson les = new Lesson(lessonName, lessonType, teacherName, lessonRoom,
-                        Integer.parseInt(lessonNumber), Integer.parseInt(dayNumber), Integer.parseInt(lessonWeek));
-                putDataToBD(les);
-                if (weekNumber == Integer.parseInt(lessonWeek))
-                    lessons.get(Integer.parseInt(dayNumber) - 1).add(les);
-            }
-
-            return true;
-        } catch (JSONException e) {
-            e.printStackTrace();
-            return false;
-        }
-
-    }
 }
