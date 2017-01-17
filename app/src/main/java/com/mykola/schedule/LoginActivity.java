@@ -111,6 +111,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             try {
                 JSONObject jsonObj = new JSONObject(String.valueOf(sb));
                 MainActivity.weekNumber = jsonObj.getInt(Constants.JSON_DATA);
+                Log.d(Constants.TAG,MainActivity.weekNumber+"");
             } catch (JSONException e) {
                 e.printStackTrace();
             }

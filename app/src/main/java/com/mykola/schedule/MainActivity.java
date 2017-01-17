@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
+        viewPager = (ViewPager) findViewById(R.id.pager);
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -66,15 +67,10 @@ public class MainActivity extends AppCompatActivity {
 
         initLessons();
 
-        Calendar c = Calendar.getInstance();
-        int week = c.get(Calendar.WEEK_OF_YEAR);
-        if (week % 2 == 1) {
-            weekNumber = Constants.SECOND_WEEK;
-        } else weekNumber = Constants.FIRST_WEEK;
-
         boolean logined = checkStatusLogin();
         if (logined) {
             groupName = getGroupName();
+            loadNumberWeek();
             readDataFromDB();
             setViewScheme();
         } else {
@@ -92,44 +88,31 @@ public class MainActivity extends AppCompatActivity {
 
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
-        if (weekNumber == 1) {
-            menu.getItem(0).setIcon(R.drawable.ic_looks_one_red_24dp);
-            menu.getItem(1).setIcon(R.drawable.ic_looks_two_white_24dp);
-        } else {
-            menu.getItem(1).setIcon(R.drawable.ic_looks_two_red_24dp);
-            menu.getItem(0).setIcon(R.drawable.ic_looks_one_white_24dp);
-        }
+        setMenuView();
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.one_week) {
             item.setIcon(R.drawable.ic_looks_one_red_24dp);
             menu.getItem(1).setIcon(R.drawable.ic_looks_two_white_24dp);
             weekNumber = Constants.FIRST_WEEK;
-            initLessons();
-            readDataFromDB();
-            setViewScheme();
-            return true;
         }
         if (id == R.id.two_week) {
             item.setIcon(R.drawable.ic_looks_two_red_24dp);
             menu.getItem(0).setIcon(R.drawable.ic_looks_one_white_24dp);
-            weekNumber =Constants.SECOND_WEEK;
-            initLessons();
-            readDataFromDB();
-            setViewScheme();
-            return true;
+            weekNumber = Constants.SECOND_WEEK;
         }
 
-        return super.onOptionsItemSelected(item);
+        initLessons();
+        readDataFromDB();
+        setViewScheme();
+
+        return true;
     }
 
     @Override
@@ -140,6 +123,12 @@ public class MainActivity extends AppCompatActivity {
             }
             groupName = data.getStringExtra(Constants.GROUP_KEY);
             setGroupName(groupName);
+
+            if (weekNumber == Constants.FIRST_WEEK)
+                saveParityWeek(false);
+            else saveParityWeek(true);
+
+            setMenuView();
             String responce = data.getStringExtra(Constants.JSON_RESPONCE_KEY);
             setStatusLogin(parseJSON(responce));
             setViewScheme();
@@ -159,6 +148,16 @@ public class MainActivity extends AppCompatActivity {
     private void clearDB() {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.delete(Constants.TABLE_NAME, null, null);
+    }
+
+    private void setMenuView() {
+        if (weekNumber == Constants.FIRST_WEEK) {
+            menu.getItem(0).setIcon(R.drawable.ic_looks_one_red_24dp);
+            menu.getItem(1).setIcon(R.drawable.ic_looks_two_white_24dp);
+        } else {
+            menu.getItem(0).setIcon(R.drawable.ic_looks_one_white_24dp);
+            menu.getItem(1).setIcon(R.drawable.ic_looks_two_red_24dp);
+        }
     }
 
     private void putDataToBD(Lesson lesson) {
@@ -203,7 +202,9 @@ public class MainActivity extends AppCompatActivity {
         c.close();
     }
 
+
     private void setViewScheme() {
+        getSupportActionBar().setTitle(getResources().getString(R.string.app_name) + "(група " + groupName + ")");
         tabLayout.removeAllTabs();
         for (int i = 0; i < 6; i++) {
             if (lessons.get(i).size() != 0) {
@@ -238,8 +239,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
-        getSupportActionBar().setTitle(getResources().getString(R.string.app_name) + "(група " + groupName + ")");
-        viewPager = (ViewPager) findViewById(R.id.pager);
         adapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
@@ -286,6 +285,34 @@ public class MainActivity extends AppCompatActivity {
     private String getGroupName() {
         sPref = getSharedPreferences(Constants.SHARED_PREFERENCES, MODE_PRIVATE);
         return sPref.getString(Constants.GROUP_KEY, "");
+    }
+
+    private void saveParityWeek(boolean parity) {
+        sPref = getSharedPreferences(Constants.SHARED_PREFERENCES, MODE_PRIVATE);
+        SharedPreferences.Editor ed = sPref.edit();
+        ed.putBoolean(Constants.PARITY_WEEK_KEY, parity);
+        ed.commit();
+
+    }
+
+    private boolean checkParityWeek() {
+        sPref = getSharedPreferences(Constants.SHARED_PREFERENCES, MODE_PRIVATE);
+        return sPref.getBoolean(Constants.PARITY_WEEK_KEY, false);
+    }
+
+    private void loadNumberWeek() {
+        boolean parity = checkParityWeek();
+        Calendar c = Calendar.getInstance();
+        int week = c.get(Calendar.WEEK_OF_YEAR);
+        if (parity) {
+            if (week % 2 == 0) {
+                weekNumber = Constants.SECOND_WEEK;
+            } else weekNumber = Constants.FIRST_WEEK;
+        } else {
+            if (week % 2 == 0) {
+                weekNumber = Constants.FIRST_WEEK;
+            } else weekNumber = Constants.SECOND_WEEK;
+        }
     }
 
     private boolean parseJSON(String jsonStr) {

@@ -33,4 +33,7 @@ public final class Constants {
 
     public static final int FIRST_WEEK = 1;
     public static final int SECOND_WEEK = 2;
+
+    public static String PARITY_WEEK_KEY = "PARITY_WEEK_KEY";
 }
+
