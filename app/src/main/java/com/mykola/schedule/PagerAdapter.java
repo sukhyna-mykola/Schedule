@@ -11,7 +11,7 @@ import java.util.ArrayList;
  */
 
 public class PagerAdapter extends FragmentStatePagerAdapter {
-    int mNumOfTabs;
+    private int mNumOfTabs;
 
 
     public PagerAdapter(FragmentManager fm, int mNumOfTabs) {

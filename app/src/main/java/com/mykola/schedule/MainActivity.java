@@ -1,13 +1,11 @@
 package com.mykola.schedule;
 
-import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -16,13 +14,8 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Iterator;
 
 public class MainActivity extends AppCompatActivity {
@@ -147,6 +140,7 @@ public class MainActivity extends AppCompatActivity {
     private void clearDB() {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.delete(Constants.TABLE_NAME, null, null);
+        db.close();
     }
 
     private void setMenuView() {
@@ -158,7 +152,6 @@ public class MainActivity extends AppCompatActivity {
             menu.getItem(1).setIcon(R.drawable.ic_looks_two_red_24dp);
         }
     }
-
 
 
     private void readDataFromDB() {
@@ -179,14 +172,16 @@ public class MainActivity extends AppCompatActivity {
             do {
 
                 Lesson lesson = new Lesson(c.getString(nameColIndex), c.getString(typeColIndex),
-                        c.getString(teacherlColIndex), c.getString(roomColIndex), c.getInt(numberColIndex),
-                        c.getInt(dayColIndex), c.getInt(weekColIndex));
-                lessons.get(c.getInt(dayColIndex) - 1).add(lesson);
+                        c.getString(teacherlColIndex), c.getString(roomColIndex), c.getString(numberColIndex),
+                        c.getString(dayColIndex), c.getString(weekColIndex));
+
+                MainActivity.lessons.get(c.getInt(dayColIndex) - 1).add(lesson);
 
             } while (c.moveToNext());
         }
 
         c.close();
+        db.close();
     }
 
 

@@ -31,8 +31,8 @@ public class LessonsAdapter extends RecyclerView.Adapter<LessonsAdapter.ViewHold
         }
     }
 
-    public LessonsAdapter(ArrayList<Lesson> lessons) {
-        this.lessons = lessons;
+    public LessonsAdapter(ArrayList<Lesson> lessonses) {
+        this.lessons = lessonses;
     }
 
     @Override
@@ -44,12 +44,12 @@ public class LessonsAdapter extends RecyclerView.Adapter<LessonsAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Lesson lesson = lessons.get(position);
-        if (lesson.getWeek() == MainActivity.weekNumber) {
-            holder.numberLesson.setText(String.valueOf(lesson.getNumber()));
-            holder.roomLesson.setText(lesson.getRoom());
-            holder.teatherLesson.setText(lesson.getTeatherName());
-            holder.nameLesson.setText(lesson.getName()+"("+lesson.getType()+")");
+        Lesson lessons = this.lessons.get(position);
+        if (Integer.parseInt(lessons.getLessonWeek()) == MainActivity.weekNumber) {
+            holder.numberLesson.setText(lessons.getLessonNumber());
+            holder.roomLesson.setText(lessons.getLessonRoom());
+            holder.teatherLesson.setText(lessons.getTeacherName());
+            holder.nameLesson.setText(lessons.getLessonName()+"("+ lessons.getLessonType()+")");
         }
 
     }
