@@ -11,24 +11,15 @@ import java.util.List;
 
 public class Lesson {
 
-    @SerializedName("lesson_id")
-    @Expose
-    private String lessonId;
-    @SerializedName("group_id")
-    @Expose
-    private String groupId;
+
     @SerializedName("day_number")
     @Expose
     private String dayNumber;
-    @SerializedName("day_name")
-    @Expose
-    private String dayName;
+
     @SerializedName("lesson_name")
     @Expose
     private String lessonName;
-    @SerializedName("lesson_full_name")
-    @Expose
-    private String lessonFullName;
+
     @SerializedName("lesson_number")
     @Expose
     private String lessonNumber;
@@ -50,31 +41,27 @@ public class Lesson {
     @SerializedName("time_end")
     @Expose
     private String timeEnd;
-    @SerializedName("rate")
-    @Expose
-    private String rate;
-    @SerializedName("teachers")
-    @Expose
-    private List<Teacher> teachers = null;
-    @SerializedName("rooms")
-    @Expose
-    private List<Room> rooms = null;
 
-    public String getLessonId() {
-        return lessonId;
+
+    private boolean currentLesson;
+    private boolean currentDay;
+
+    public boolean isCurrentLesson() {
+        return currentLesson;
     }
 
-    public void setLessonId(String lessonId) {
-        this.lessonId = lessonId;
+    public void setCurrentLesson(boolean currentLesson) {
+        this.currentLesson = currentLesson;
     }
 
-    public String getGroupId() {
-        return groupId;
+    public boolean isCurrentDay() {
+        return currentDay;
     }
 
-    public void setGroupId(String groupId) {
-        this.groupId = groupId;
+    public void setCurrentDay(boolean currentDay) {
+        this.currentDay = currentDay;
     }
+
 
     public String getDayNumber() {
         return dayNumber;
@@ -84,13 +71,6 @@ public class Lesson {
         this.dayNumber = dayNumber;
     }
 
-    public String getDayName() {
-        return dayName;
-    }
-
-    public void setDayName(String dayName) {
-        this.dayName = dayName;
-    }
 
     public String getLessonName() {
         return lessonName;
@@ -100,13 +80,6 @@ public class Lesson {
         this.lessonName = lessonName;
     }
 
-    public String getLessonFullName() {
-        return lessonFullName;
-    }
-
-    public void setLessonFullName(String lessonFullName) {
-        this.lessonFullName = lessonFullName;
-    }
 
     public String getLessonNumber() {
         return lessonNumber;
@@ -164,31 +137,10 @@ public class Lesson {
         this.timeEnd = timeEnd;
     }
 
-    public String getRate() {
-        return rate;
-    }
 
-    public void setRate(String rate) {
-        this.rate = rate;
-    }
-
-    public List<Teacher> getTeachers() {
-        return teachers;
-    }
-
-    public void setTeachers(List<Teacher> teachers) {
-        this.teachers = teachers;
-    }
-
-    public List<Room> getRooms() {
-        return rooms;
-    }
-
-    public void setRooms(List<Room> rooms) {
-        this.rooms = rooms;
-    }
-
-    public Lesson(String lessonName, String lessonType, String teacherName, String lessonRoom, String lessonNumber, String dayNumber, String lessonWeek) {
+    public Lesson(String lessonName, String lessonType, String teacherName, String lessonRoom,
+                  String lessonNumber, String dayNumber, String lessonWeek,
+                  String startTime, String endTime) {
         this.lessonName = lessonName;
         this.lessonType = lessonType;
         this.teacherName = teacherName;
@@ -196,5 +148,7 @@ public class Lesson {
         this.lessonNumber = lessonNumber;
         this.lessonWeek = lessonWeek;
         this.dayNumber = dayNumber;
+        this.timeStart = startTime;
+        this.timeEnd = endTime;
     }
 }

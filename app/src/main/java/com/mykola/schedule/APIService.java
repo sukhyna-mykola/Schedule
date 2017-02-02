@@ -12,7 +12,7 @@ import retrofit2.http.Path;
  * Created by mykola on 31.01.17.
  */
 
-public interface Methods {
+public interface APIService {
     @GET("groups/{group_name}/lessons")
     Call<ResponceLessons> getLessons(@Path("group_name") String groupName);
 

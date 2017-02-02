@@ -4,18 +4,23 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Iterator;
 
 public class MainActivity extends AppCompatActivity {
@@ -23,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static ArrayList<ArrayList<Lesson>> lessons;
     public static int weekNumber;
+    private static int currentWeek;
 
     private PagerAdapter adapter;
     private TabLayout tabLayout;
@@ -133,7 +139,6 @@ public class MainActivity extends AppCompatActivity {
         lessons = new ArrayList<>();
         for (int i = 0; i < 6; i++) {
             lessons.add(new ArrayList<Lesson>());
-
         }
     }
 
@@ -158,6 +163,10 @@ public class MainActivity extends AppCompatActivity {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         Cursor c = db.query(Constants.TABLE_NAME, null, Constants.LESSON_WEEK + "=?", new String[]{String.valueOf(MainActivity.weekNumber)}, null, null, null);
 
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
+        int day = calendar.get(Calendar.DAY_OF_WEEK) - 1;
+
         if (c.moveToFirst()) {
 
             int dayColIndex = c.getColumnIndex(Constants.DAY_NUMBER);
@@ -167,13 +176,30 @@ public class MainActivity extends AppCompatActivity {
             int roomColIndex = c.getColumnIndex(Constants.LESSON_ROOM);
             int numberColIndex = c.getColumnIndex(Constants.LESSON_NUMBER);
             int weekColIndex = c.getColumnIndex(Constants.LESSON_WEEK);
+            int startColIndex = c.getColumnIndex(Constants.TIME_START);
+            int endlIndex = c.getColumnIndex(Constants.TIME_END);
 
 
             do {
 
                 Lesson lesson = new Lesson(c.getString(nameColIndex), c.getString(typeColIndex),
                         c.getString(teacherlColIndex), c.getString(roomColIndex), c.getString(numberColIndex),
-                        c.getString(dayColIndex), c.getString(weekColIndex));
+                        c.getString(dayColIndex), c.getString(weekColIndex), c.getString(startColIndex), c.getString(endlIndex));
+                try {
+                    Date start = df.parse(lesson.getTimeStart());
+                    Date end = df.parse(lesson.getTimeEnd());
+                    Date thisTime = df.parse(df.format(calendar.getTime()));
+
+                    if ((day == Integer.parseInt(lesson.getDayNumber())) && (Integer.parseInt(lesson.getLessonWeek()) == currentWeek)) {
+                        if (thisTime.after(start) && thisTime.before(end)) {
+                            lesson.setCurrentLesson(true);
+                        }
+
+                        lesson.setCurrentDay(true);
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
 
                 MainActivity.lessons.get(c.getInt(dayColIndex) - 1).add(lesson);
 
@@ -182,12 +208,20 @@ public class MainActivity extends AppCompatActivity {
 
         c.close();
         db.close();
+
+
     }
 
 
     private void setViewScheme() {
         getSupportActionBar().setTitle(getResources().getString(R.string.app_name) + "(група " + groupName + ")");
         tabLayout.removeAllTabs();
+        //Тут я віднімаю 1 через те, що відлік днів відбувається з неділлі
+        int day = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1;
+        Log.d("TAG", " day = " + day);
+        int position = -1;
+        int count = 0;
+
         for (int i = 0; i < 6; i++) {
             if (lessons.get(i).size() != 0) {
                 switch (i) {
@@ -210,7 +244,13 @@ public class MainActivity extends AppCompatActivity {
                         tabLayout.addTab(tabLayout.newTab().setText(R.string.saturday));
                         break;
                 }
+
+                if (day == i + 1) {
+                    position = count;
+                }
+                count++;
             }
+
         }
 
         Iterator<ArrayList<Lesson>> iter = lessons.iterator();
@@ -220,9 +260,12 @@ public class MainActivity extends AppCompatActivity {
                 iter.remove();
             }
         }
+
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
         adapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
         viewPager.setAdapter(adapter);
+        if (position != -1)
+            viewPager.setCurrentItem(position);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -232,6 +275,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
+
 
             }
 
@@ -295,6 +339,7 @@ public class MainActivity extends AppCompatActivity {
                 weekNumber = Constants.FIRST_WEEK;
             } else weekNumber = Constants.SECOND_WEEK;
         }
+        currentWeek = weekNumber;
     }
 
 

@@ -11,7 +11,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class App extends Application {
 
-    private static Methods myApi;
+    private static APIService myApi;
     private Retrofit retrofit;
 
     @Override
@@ -23,10 +23,10 @@ public class App extends Application {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        myApi = retrofit.create(Methods.class);
+        myApi = retrofit.create(APIService.class);
     }
 
-    public static Methods getApi() {
+    public static APIService getApi() {
         return myApi;
     }
 }

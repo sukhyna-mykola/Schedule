@@ -19,14 +19,17 @@ class DBHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
 
         // создаем таблицу с полями
-        db.execSQL("create table "+Constants.TABLE_NAME+" ("
-                + Constants.DAY_NUMBER+" "+Constants.INTEGER+","
-                + Constants.LESSON_NAME+" "+Constants.TEXT+","
-                + Constants.LESSON_NUMBER+" "+Constants.INTEGER+","
-                + Constants.LESSON_ROOM+" "+Constants.TEXT+","
-                + Constants.LESSON_TYPE+" "+Constants.TEXT+","
-                + Constants.TEACHER_NAME+" "+Constants.TEXT+","
-                + Constants.LESSON_WEEK+" "+Constants.INTEGER+");");
+        db.execSQL("create table " + Constants.TABLE_NAME + " ("
+                + Constants.LESSON_WEEK + " " + Constants.INTEGER + ","
+                + Constants.LESSON_NAME + " " + Constants.TEXT + ","
+                + Constants.LESSON_NUMBER + " " + Constants.INTEGER + ","
+                + Constants.LESSON_ROOM + " " + Constants.TEXT + ","
+                + Constants.LESSON_TYPE + " " + Constants.TEXT + ","
+                + Constants.TEACHER_NAME + " " + Constants.TEXT + ","
+                + Constants.TIME_START + " " + Constants.TEXT + ","
+                + Constants.TIME_END + " " + Constants.TEXT + ","
+                + Constants.DAY_NUMBER + " " + Constants.INTEGER +
+                ");");
     }
 
     @Override
