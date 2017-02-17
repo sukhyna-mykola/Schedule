@@ -20,7 +20,6 @@ public class DayFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view =inflater.inflate(R.layout.day_fragment, container, false);
-        TextView tv = (TextView) view.findViewById(R.id.tmp_text);
         int day = getArguments().getInt(Constants.DAY_NUMBER_KEY,0);
 
         RecyclerView mRecyclerView = (RecyclerView) view.findViewById(R.id.lessons_list);
@@ -29,13 +28,12 @@ public class DayFragment extends Fragment {
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mAdapter = new LessonsAdapter(MainActivity.lessons.get(day));
+        mAdapter = new LessonsAdapter(ScheduleManager.get(getContext()).getLessons().get(day),getContext());
         mRecyclerView.setAdapter(mAdapter);
         return view;
     }
 
     public static DayFragment newInstance(int position) {
-
         Bundle args = new Bundle();
         args.putInt(Constants.DAY_NUMBER_KEY,position);
         DayFragment fragment = new DayFragment();

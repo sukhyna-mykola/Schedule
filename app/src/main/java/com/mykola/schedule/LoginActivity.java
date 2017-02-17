@@ -1,24 +1,21 @@
 package com.mykola.schedule;
 
-import android.content.ContentValues;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
-
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -28,17 +25,17 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private EditText groupNameInputField;
 
-    private DBHelper dbHelper;
     private ProgressBar progressBar;
     private ArrayAdapter<String> listAdapter;
     private ListView itemList;
+    private ScheduleManager manager;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        dbHelper = new DBHelper(this);
+        manager = ScheduleManager.get(this);
         groupNameInputField = (EditText) findViewById(R.id.group_name_input_field);
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
         itemList = (ListView) findViewById(R.id.listView);
@@ -59,13 +56,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                 before = s.length();
-                Log.d("TAG","before = "+s.length());
+                Log.d("TAG", "before = " + s.length());
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 after = s.length();
-                Log.d("TAG","after = "+s.length());
+                Log.d("TAG", "after = " + s.length());
                 if (s.length() > 0)
                     searchGroups(String.valueOf(s));
 
@@ -95,6 +92,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void makeRequest(final View v) {
+
+        // get WeekNumber
         v.setVisibility(View.GONE);
         itemList.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
@@ -103,8 +102,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         callWeek.enqueue(new Callback<ResponceWeek>() {
             @Override
             public void onResponse(Call<ResponceWeek> call, Response<ResponceWeek> response) {
-                MainActivity.weekNumber = response.body().getData();
-                Log.d("TAG", String.valueOf(MainActivity.weekNumber));
+                int week = response.body().getData();
+                manager.setWeek(week);
             }
 
             @Override
@@ -115,7 +114,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             }
         });
 
-
+        //get Schedule
         final String groupName = String.valueOf(groupNameInputField.getText()).toLowerCase();
 
         Call<ResponceLessons> callLessons = App.getApi().getLessons(groupName);
@@ -123,13 +122,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             @Override
             public void onResponse(Call<ResponceLessons> call, Response<ResponceLessons> response) {
                 if (response.body() != null) {
-                    for (Lesson lessson : response.body().getData()) {
-                        Log.d("TAG", lessson.getLessonName());
-                        putDataToDB(lessson);
-                    }
+
+                    manager.logIn(groupName, response.body().getData());
 
                     Intent intent = new Intent();
-                    intent.putExtra(Constants.GROUP_KEY, groupName);
                     setResult(RESULT_OK, intent);
                     finish();
                 } else {
@@ -180,23 +176,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         });
 
 
-    }
-
-    private void putDataToDB(Lesson lesson) {
-        ContentValues cv = new ContentValues();
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-
-        cv.put(Constants.TEACHER_NAME, lesson.getTeacherName());
-        cv.put(Constants.LESSON_NAME, lesson.getLessonName());
-        cv.put(Constants.LESSON_NUMBER, lesson.getLessonNumber());
-        cv.put(Constants.LESSON_ROOM, lesson.getLessonRoom());
-        cv.put(Constants.LESSON_TYPE, lesson.getLessonType());
-        cv.put(Constants.DAY_NUMBER, lesson.getDayNumber());
-        cv.put(Constants.LESSON_WEEK, lesson.getLessonWeek());
-        cv.put(Constants.TIME_END, lesson.getTimeEnd());
-        cv.put(Constants.TIME_START, lesson.getTimeStart());
-
-        db.insert(Constants.TABLE_NAME, null, cv);
     }
 
 

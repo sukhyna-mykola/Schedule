@@ -1,5 +1,6 @@
 package com.mykola.schedule;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -21,6 +22,7 @@ import java.util.Date;
 
 public class LessonsAdapter extends RecyclerView.Adapter<LessonsAdapter.ViewHolder> {
     private ArrayList<Lesson> lessons;
+    private  Context context;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView nameLesson;
@@ -43,8 +45,9 @@ public class LessonsAdapter extends RecyclerView.Adapter<LessonsAdapter.ViewHold
         }
     }
 
-    public LessonsAdapter(ArrayList<Lesson> lessonses) {
+    public LessonsAdapter(ArrayList<Lesson> lessonses, Context context) {
         this.lessons = lessonses;
+        this.context = context;
     }
 
     @Override
@@ -57,7 +60,7 @@ public class LessonsAdapter extends RecyclerView.Adapter<LessonsAdapter.ViewHold
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         Lesson lesson = lessons.get(position);
-        if (Integer.parseInt(lesson.getLessonWeek()) == MainActivity.weekNumber) {
+        if (Integer.parseInt(lesson.getLessonWeek()) == ScheduleManager.get(context).getWeekNumber()) {
             holder.numberLesson.setText(lesson.getLessonNumber());
             holder.roomLesson.setText(lesson.getLessonRoom());
             holder.teatherLesson.setText(lesson.getTeacherName());

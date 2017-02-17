@@ -21,8 +21,6 @@ public final class Constants {
     public static final String TIME_START = "time_start";
     public static final String TIME_END = "time_end";
 
-
-
     public static final String DAY_NUMBER_KEY =  "DAY_NUMBER_KEY";
 
     public static final String DB_NAME = "LESSONS_TABLE";
