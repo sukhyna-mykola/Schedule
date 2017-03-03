@@ -1,19 +1,20 @@
 package com.mykola.schedule;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 import static android.content.Context.MODE_PRIVATE;
+import static com.mykola.schedule.Constants.CODE_ERROR;
+import static com.mykola.schedule.Constants.CODE_OK;
 
 /**
  * Created by mykola on 17.02.17.
@@ -21,7 +22,7 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class ScheduleManager {
 
-    private ArrayList<ArrayList<Lesson>> lessons;
+    private HashMap<Integer, List<Lesson>> lessons;
     private int weekNumber;
     private int currentWeek;
 
@@ -33,6 +34,8 @@ public class ScheduleManager {
 
     private static ScheduleManager manager;
 
+    private Request request;
+
     public String getGroupName() {
         return groupName;
     }
@@ -41,10 +44,13 @@ public class ScheduleManager {
         this.groupName = groupName;
     }
 
-    public ArrayList<ArrayList<Lesson>> getLessons() {
+    public HashMap<Integer, List<Lesson>> getLessons() {
         return lessons;
     }
 
+    public void setLessons(HashMap<Integer, List<Lesson>> lessons) {
+        this.lessons = lessons;
+    }
 
     public int getWeekNumber() {
         return weekNumber;
@@ -58,6 +64,7 @@ public class ScheduleManager {
     private ScheduleManager(Context context) {
         this.context = context;
         dbHelper = new DBHelper(context);
+        sPref = context.getSharedPreferences(Constants.SHARED_PREFERENCES, MODE_PRIVATE);
         setGroupName(readGroupName());
     }
 
@@ -68,10 +75,93 @@ public class ScheduleManager {
     }
 
     public void logOut() {
-        clearDB();
         saveStatusLogin(false);
     }
 
+    public void registerCallback(Request request) {
+        this.request = request;
+    }
+
+    public synchronized void getSheduleFromServer(final String name) {
+
+        Call<ResponceLessons> callLessons = App.getApi().getLessons(name);
+        callLessons.enqueue(new Callback<ResponceLessons>() {
+            @Override
+            public void onResponse(Call<ResponceLessons> call, Response<ResponceLessons> response) {
+                if (response.body() != null) {
+                    clearDB();
+                    logIn(name, response.body().getData());
+                    request.responceSchedule(CODE_OK);
+
+                } else {
+                    request.responceSchedule(CODE_ERROR);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponceLessons> call, Throwable t) {
+                request.responceSchedule(CODE_ERROR);
+            }
+        });
+    }
+
+
+    public void clearDB(){
+        dbHelper.clearDB();
+    }
+
+    public synchronized void getWeekFromServer() {
+
+        Call<ResponceWeek> callWeek = App.getApi().getWeek();
+        callWeek.enqueue(new Callback<ResponceWeek>() {
+            @Override
+            public void onResponse(Call<ResponceWeek> call, Response<ResponceWeek> response) {
+                setWeek(response.body().getData());
+                request.responceWeek(CODE_OK);
+            }
+
+            @Override
+            public void onFailure(Call<ResponceWeek> call, Throwable t) {
+                request.responceWeek(CODE_ERROR);
+            }
+        });
+    }
+
+
+    /**
+     * Підказки при введенні назви групи
+     * @param groupName
+     */
+    public void searchGroups(String groupName) {
+        final ArrayList<String> result = new ArrayList<>();
+        String filter = "{'query':'" + groupName + "'}";
+        Call<ResponceSearchGroups> callGroups = App.getApi().searchGroupsByName(filter);
+        callGroups.enqueue(new Callback<ResponceSearchGroups>() {
+            String[] names;
+
+            @Override
+            public void onResponse(Call<ResponceSearchGroups> call, Response<ResponceSearchGroups> response) {
+                if (response.body() != null)
+                    for (Group group : response.body().getData()) {
+                        result.add(group.getGroupFullName());
+                    }
+                names = new String[result.size()];
+                result.toArray(names);
+                request.responceGroupsHint(CODE_OK, names);
+
+            }
+
+            @Override
+            public void onFailure(Call<ResponceSearchGroups> call, Throwable t) {
+                names = new String[result.size()];
+                result.toArray(names);
+                request.responceGroupsHint(CODE_ERROR, names);
+
+            }
+        });
+
+
+    }
 
     public void setWeek(int week) {
         setWeekNumber(week);
@@ -81,115 +171,39 @@ public class ScheduleManager {
     }
 
     public void logIn(String name, List<Lesson> lessons) {
+
         for (Lesson lessson : lessons) {
-            putDataToDB(lessson);
+            dbHelper.putLessonIntoDB(lessson);
         }
         saveGroupName(name);
-        setGroupName(name);
         saveStatusLogin(true);
+
+        setGroupName(name);
     }
 
     public void loadSchedule() {
         loadNumberWeek();
-        readDataFromDB();
+        setLessons(dbHelper.readLessonsFromDB(weekNumber));
     }
 
-    public void showScheduleOfWeek() {
-        readDataFromDB();
+    public void loadScheduleOfWeek() {
+        setLessons(dbHelper.readLessonsFromDB(weekNumber));
     }
 
-    private void clearDB() {
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        db.delete(Constants.TABLE_NAME, null, null);
-        db.close();
-    }
-
-    private void readDataFromDB() {
-        initLessons();
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        Cursor c = db.query(Constants.TABLE_NAME, null, Constants.LESSON_WEEK + "=?", new String[]{String.valueOf(weekNumber)}, null, null, null);
-
-        Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
-        int day = calendar.get(Calendar.DAY_OF_WEEK) - 1;
-
-        if (c.moveToFirst()) {
-
-            int dayColIndex = c.getColumnIndex(Constants.DAY_NUMBER);
-            int nameColIndex = c.getColumnIndex(Constants.LESSON_NAME);
-            int teacherlColIndex = c.getColumnIndex(Constants.TEACHER_NAME);
-            int typeColIndex = c.getColumnIndex(Constants.LESSON_TYPE);
-            int roomColIndex = c.getColumnIndex(Constants.LESSON_ROOM);
-            int numberColIndex = c.getColumnIndex(Constants.LESSON_NUMBER);
-            int weekColIndex = c.getColumnIndex(Constants.LESSON_WEEK);
-            int startColIndex = c.getColumnIndex(Constants.TIME_START);
-            int endlIndex = c.getColumnIndex(Constants.TIME_END);
-
-
-            do {
-
-                Lesson lesson = new Lesson(c.getString(nameColIndex), c.getString(typeColIndex),
-                        c.getString(teacherlColIndex), c.getString(roomColIndex), c.getString(numberColIndex),
-                        c.getString(dayColIndex), c.getString(weekColIndex), c.getString(startColIndex), c.getString(endlIndex));
-                try {
-                    Date start = df.parse(lesson.getTimeStart());
-                    Date end = df.parse(lesson.getTimeEnd());
-                    Date thisTime = df.parse(df.format(calendar.getTime()));
-
-                    if ((day == Integer.parseInt(lesson.getDayNumber())) && (Integer.parseInt(lesson.getLessonWeek()) == currentWeek)) {
-                        if (thisTime.after(start) && thisTime.before(end)) {
-                            lesson.setCurrentLesson(true);
-                        }
-
-                        lesson.setCurrentDay(true);
-                    }
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-
-                lessons.get(c.getInt(dayColIndex) - 1).add(lesson);
-
-            } while (c.moveToNext());
-        }
-
-        c.close();
-        db.close();
-
-
-    }
 
     private void saveStatusLogin(boolean statusLogin) {
-        sPref = context.getSharedPreferences(Constants.SHARED_PREFERENCES, MODE_PRIVATE);
         SharedPreferences.Editor ed = sPref.edit();
         ed.putBoolean(Constants.LOGIN_KEY, statusLogin);
         ed.commit();
-
     }
 
-    private void saveGroupName(String name) {
-        sPref = context.getSharedPreferences(Constants.SHARED_PREFERENCES, MODE_PRIVATE);
-        SharedPreferences.Editor ed = sPref.edit();
-        ed.putString(Constants.GROUP_KEY, name);
-        ed.commit();
-    }
-
-    public boolean checkStatusLogin() {
-        sPref = context.getSharedPreferences(Constants.SHARED_PREFERENCES, MODE_PRIVATE);
+    public boolean readStatusLogin() {
         return sPref.getBoolean(Constants.LOGIN_KEY, false);
     }
 
 
-    private void saveParityWeek(boolean parity) {
-        sPref = context.getSharedPreferences(Constants.SHARED_PREFERENCES, MODE_PRIVATE);
-        SharedPreferences.Editor ed = sPref.edit();
-        ed.putBoolean(Constants.PARITY_WEEK_KEY, parity);
-        ed.commit();
-
-    }
-
-
     private void loadNumberWeek() {
-        boolean parity = checkParityWeek();
+        boolean parity = readParityWeek();
         Calendar c = Calendar.getInstance();
         int week = c.get(Calendar.WEEK_OF_YEAR);
         if (parity) {
@@ -204,38 +218,24 @@ public class ScheduleManager {
         currentWeek = weekNumber;
     }
 
-
-    private void putDataToDB(Lesson lesson) {
-        ContentValues cv = new ContentValues();
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-
-        cv.put(Constants.TEACHER_NAME, lesson.getTeacherName());
-        cv.put(Constants.LESSON_NAME, lesson.getLessonName());
-        cv.put(Constants.LESSON_NUMBER, lesson.getLessonNumber());
-        cv.put(Constants.LESSON_ROOM, lesson.getLessonRoom());
-        cv.put(Constants.LESSON_TYPE, lesson.getLessonType());
-        cv.put(Constants.DAY_NUMBER, lesson.getDayNumber());
-        cv.put(Constants.LESSON_WEEK, lesson.getLessonWeek());
-        cv.put(Constants.TIME_END, lesson.getTimeEnd());
-        cv.put(Constants.TIME_START, lesson.getTimeStart());
-
-        db.insert(Constants.TABLE_NAME, null, cv);
-    }
-
-    private void initLessons() {
-        lessons = new ArrayList<>();
-        for (int i = 0; i < 6; i++) {
-            lessons.add(new ArrayList<Lesson>());
-        }
-    }
-
-    private boolean checkParityWeek() {
-        sPref = context.getSharedPreferences(Constants.SHARED_PREFERENCES, MODE_PRIVATE);
+    private boolean readParityWeek() {
         return sPref.getBoolean(Constants.PARITY_WEEK_KEY, false);
     }
 
+    private void saveParityWeek(boolean parity) {
+        SharedPreferences.Editor ed = sPref.edit();
+        ed.putBoolean(Constants.PARITY_WEEK_KEY, parity);
+        ed.commit();
+
+    }
+
     private String readGroupName() {
-        sPref = context.getSharedPreferences(Constants.SHARED_PREFERENCES, MODE_PRIVATE);
-        return sPref.getString(Constants.GROUP_KEY, "");
+        return sPref.getString(Constants.GROUP_KEY, "GROUPE");
+    }
+
+    private void saveGroupName(String name) {
+        SharedPreferences.Editor ed = sPref.edit();
+        ed.putString(Constants.GROUP_KEY, name);
+        ed.commit();
     }
 }

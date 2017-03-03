@@ -3,13 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.mykola.schedule.MainActivity">
     <item
-        android:id="@+id/one_week"
+        android:id="@+id/first_week"
         android:orderInCategory="100"
         android:icon="@drawable/ic_looks_one_white_24dp"
         android:title="@string/action_settings"
         app:showAsAction="always" />
     <item
-        android:id="@+id/two_week"
+        android:id="@+id/second_week"
         android:orderInCategory="100"
         android:icon="@drawable/ic_looks_two_white_24dp"
         android:title="@string/action_settings"

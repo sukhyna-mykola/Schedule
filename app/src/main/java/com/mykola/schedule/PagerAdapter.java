@@ -5,27 +5,27 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by mykola on 16.01.17.
  */
 
 public class PagerAdapter extends FragmentStatePagerAdapter {
-    private int mNumOfTabs;
+    private List<Integer> days;
 
-
-    public PagerAdapter(FragmentManager fm, int mNumOfTabs) {
+    public PagerAdapter(FragmentManager fm, List<Integer> days) {
         super(fm);
-        this.mNumOfTabs = mNumOfTabs;
+        this.days = days;
     }
 
     @Override
     public Fragment getItem(int position) {
-        return DayFragment.newInstance(position);
+        return DayFragment.newInstance(days.get(position));
     }
 
     @Override
     public int getCount() {
-        return mNumOfTabs;
+        return days.size();
     }
 }

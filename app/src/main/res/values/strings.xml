@@ -1,11 +1,13 @@
 <resources>
     <string name="app_name">Розклад КПІ</string>
-    <string name="action_settings">Settings</string>
-    <string name="monday">Понеділок</string>
-    <string name="tuesday">Вівторок</string>
-    <string name="wednesday">Середа</string>
-    <string name="thursday">Червер</string>
-    <string name="friday">Пятниця</string>
-    <string name="saturday">Субота</string>
+    <string-array name="days_of_week">
+        <item>Понеділок</item>
+        <item>Вівторок</item>
+        <item>Середа</item>
+        <item>Червер</item>
+        <item>Пятниця</item>
+        <item>Субота</item>
+    </string-array>
     <string name="input_group_name">Введіть назву групи</string>
+    <string name="title">Група %1$s</string>
 </resources>
