@@ -26,7 +26,7 @@ import static android.app.Activity.RESULT_OK;
  * Created by mykola on 03.03.17.
  */
 
-public class SheduleFragment extends Fragment implements View.OnClickListener {
+public class ScheduleFragment extends Fragment implements View.OnClickListener {
 
     public static final int REQUEST_CODE = 14;
 
@@ -39,6 +39,16 @@ public class SheduleFragment extends Fragment implements View.OnClickListener {
 
     private Menu menu;
 
+
+    public static ScheduleFragment newInstance() {
+
+        Bundle args = new Bundle();
+
+        ScheduleFragment fragment = new ScheduleFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,7 +59,7 @@ public class SheduleFragment extends Fragment implements View.OnClickListener {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_shedule, container, false);
+        View view = inflater.inflate(R.layout.fragment_schedule, container, false);
         fab = (FloatingActionButton) view.findViewById(R.id.fab);
         tabLayout = (TabLayout) view.findViewById(R.id.tab_layout);
         viewPager = (ViewPager) view.findViewById(R.id.pager);
@@ -155,7 +165,7 @@ public class SheduleFragment extends Fragment implements View.OnClickListener {
             if (position >= 0 && position < daysName.length)
                 tabLayout.addTab(tabLayout.newTab().setText(daysName[position]));
         }
-        
+
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
