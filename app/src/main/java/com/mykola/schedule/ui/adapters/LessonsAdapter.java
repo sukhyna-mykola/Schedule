@@ -1,27 +1,26 @@
-package com.mykola.schedule;
+package com.mykola.schedule.ui.adapters;
 
 import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import com.mykola.schedule.data.storage.models.LessonDTO;
+import com.mykola.schedule.R;
+import com.mykola.schedule.data.managers.ScheduleManager;
+
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 
 /**
  * Created by mykola on 16.01.17.
  */
 
 public class LessonsAdapter extends RecyclerView.Adapter<LessonsAdapter.ViewHolder> {
-    private ArrayList<Lesson> lessons;
+    private ArrayList<LessonDTO> lessons;
     private  Context context;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -45,7 +44,7 @@ public class LessonsAdapter extends RecyclerView.Adapter<LessonsAdapter.ViewHold
         }
     }
 
-    public LessonsAdapter(ArrayList<Lesson> lessonses, Context context) {
+    public LessonsAdapter(ArrayList<LessonDTO> lessonses, Context context) {
         this.lessons = lessonses;
         this.context = context;
     }
@@ -59,7 +58,7 @@ public class LessonsAdapter extends RecyclerView.Adapter<LessonsAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Lesson lesson = lessons.get(position);
+        LessonDTO lesson = lessons.get(position);
         if (Integer.parseInt(lesson.getLessonWeek()) == ScheduleManager.get(context).getWeekNumber()) {
             holder.numberLesson.setText(lesson.getLessonNumber());
             holder.roomLesson.setText(lesson.getLessonRoom());

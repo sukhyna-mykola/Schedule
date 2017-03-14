@@ -1,10 +1,11 @@
-package com.mykola.schedule;
+package com.mykola.schedule.ui.adapters;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import java.util.ArrayList;
+import com.mykola.schedule.ui.fragments.DayFragment;
+
 import java.util.List;
 
 /**

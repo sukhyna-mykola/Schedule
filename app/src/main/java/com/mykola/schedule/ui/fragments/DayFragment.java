@@ -1,4 +1,4 @@
-package com.mykola.schedule;
+package com.mykola.schedule.ui.fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -7,7 +7,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+
+import com.mykola.schedule.utils.Constants;
+import com.mykola.schedule.data.storage.models.LessonDTO;
+import com.mykola.schedule.ui.adapters.LessonsAdapter;
+import com.mykola.schedule.R;
+import com.mykola.schedule.data.managers.ScheduleManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +24,7 @@ import java.util.List;
 public class DayFragment extends Fragment {
     private RecyclerView.LayoutManager mLayoutManager;
     private RecyclerView.Adapter mAdapter;
-    private List<Lesson> lessons;
+    private List<LessonDTO> lessons;
 
     public static DayFragment newInstance(int day) {
         Bundle args = new Bundle();
@@ -42,7 +47,7 @@ public class DayFragment extends Fragment {
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mAdapter = new LessonsAdapter((ArrayList<Lesson>) lessons,getContext());
+        mAdapter = new LessonsAdapter((ArrayList<LessonDTO>) lessons,getContext());
         mRecyclerView.setAdapter(mAdapter);
         return view;
     }

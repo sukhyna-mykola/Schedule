@@ -1,17 +1,16 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.mykola.schedule.ScheduleActivity">
+    tools:context="com.mykola.schedule.ui.activitys.ScheduleActivity">
     <item
-        android:id="@+id/first_week"
-        android:orderInCategory="100"
+        android:id="@+id/week"
         android:icon="@drawable/ic_looks_one_white_24dp"
         android:title="Title"
         app:showAsAction="always" />
     <item
-        android:id="@+id/second_week"
-        android:orderInCategory="100"
-        android:icon="@drawable/ic_looks_two_white_24dp"
-        android:title="Title"
-        app:showAsAction="always" />
+        android:id="@+id/search"
+        android:title="Змінити групу" />
+    <item
+        android:id="@+id/update"
+        android:title="Оновити розклад" />
 </menu>

@@ -1,4 +1,4 @@
-package com.mykola.schedule;
+package com.mykola.schedule.utils;
 
 /**
  * Created by mykola on 16.01.17.
@@ -32,7 +32,7 @@ public final class Constants {
     public static final int FIRST_WEEK = 1;
     public static final int SECOND_WEEK = 2;
 
-    public static String PARITY_WEEK_KEY = "PARITY_WEEK_KEY";
+    public static final String PARITY_WEEK_KEY = "PARITY_WEEK_KEY";
 
     public static final int CODE_OK = 0;
     public static final int CODE_ERROR = 1;

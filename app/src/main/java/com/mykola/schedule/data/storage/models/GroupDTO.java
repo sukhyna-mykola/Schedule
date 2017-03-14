@@ -1,4 +1,4 @@
-package com.mykola.schedule;
+package com.mykola.schedule.data.storage.models;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName;
  * Created by mykola on 02.02.17.
  */
 
-public class Group {
+public class GroupDTO {
 
     @SerializedName("group_full_name")
     @Expose

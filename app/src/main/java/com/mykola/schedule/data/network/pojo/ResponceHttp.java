@@ -1,4 +1,4 @@
-package com.mykola.schedule;
+package com.mykola.schedule.data.network.pojo;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

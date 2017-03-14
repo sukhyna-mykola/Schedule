@@ -1,9 +1,8 @@
-package com.mykola.schedule;
+package com.mykola.schedule.ui.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
@@ -14,11 +13,26 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
+
+import com.mykola.schedule.R;
+import com.mykola.schedule.data.managers.ScheduleManager;
+import com.mykola.schedule.data.network.pojo.ResponceLessons;
+import com.mykola.schedule.data.network.pojo.ResponceWeek;
+import com.mykola.schedule.ui.activitys.SearchActivity;
+import com.mykola.schedule.ui.adapters.PagerAdapter;
+import com.mykola.schedule.utils.Constants;
+import com.mykola.schedule.utils.Loger;
+import com.mykola.schedule.utils.NetworkStatusChecker;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -33,7 +47,6 @@ public class ScheduleFragment extends Fragment implements View.OnClickListener {
     private PagerAdapter adapter;
     private TabLayout tabLayout;
     private ViewPager viewPager;
-    private FloatingActionButton fab;
 
     private ScheduleManager manager;
 
@@ -60,17 +73,15 @@ public class ScheduleFragment extends Fragment implements View.OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_schedule, container, false);
-        fab = (FloatingActionButton) view.findViewById(R.id.fab);
         tabLayout = (TabLayout) view.findViewById(R.id.tab_layout);
         viewPager = (ViewPager) view.findViewById(R.id.pager);
 
-        fab.setOnClickListener(this);
-
         manager = ScheduleManager.get(getActivity());
-        if (manager.readStatusLogin() == true) {
+
+        if (manager.getManagerPreferences().readStatusLogin() == true) {
             manager.loadSchedule();
             setSheduleView();
-            setTitleFragment(manager.getGroupName());
+            setTitleFragment(manager.getManagerPreferences().readGroupName());
         } else {
             showSearchScreen();
         }
@@ -91,20 +102,26 @@ public class ScheduleFragment extends Fragment implements View.OnClickListener {
 
         int id = item.getItemId();
         switch (id) {
-            case R.id.first_week:
-                manager.setWeekNumber(Constants.FIRST_WEEK);
-                manager.loadScheduleOfWeek();
+            case R.id.week:
 
-                break;
-            case R.id.second_week:
-                manager.setWeekNumber(Constants.SECOND_WEEK);
+                if (manager.getWeekNumber() == Constants.FIRST_WEEK)
+                    manager.setWeekNumber(Constants.SECOND_WEEK);
+                else
+                    manager.setWeekNumber(Constants.FIRST_WEEK);
                 manager.loadScheduleOfWeek();
+                setSheduleView();
+                setMenuView();
                 break;
+            case R.id.search:
+                manager.logOut();
+                showSearchScreen();
+                break;
+            case R.id.update:
+                getSchedule(manager.getManagerPreferences().readGroupName());
+                break;
+
         }
 
-        setSheduleView();
-        setMenuView();
-        setTitleFragment(manager.getGroupName());
 
         return true;
     }
@@ -112,10 +129,7 @@ public class ScheduleFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK & requestCode == REQUEST_CODE) {
-            manager.loadSchedule();//завантажити розклад з бази
-            setSheduleView();//відобразити розклад
-            setMenuView();//відобразити меню
-            setTitleFragment(manager.getGroupName());
+            loadSheduleFromDB();
         }
     }
 
@@ -123,10 +137,6 @@ public class ScheduleFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.fab:
-                manager.logOut();
-                showSearchScreen();
-                break;
         }
     }
 
@@ -141,12 +151,15 @@ public class ScheduleFragment extends Fragment implements View.OnClickListener {
     }
 
     private void setMenuView() {
+        MenuItem weekIcon = menu.findItem(R.id.week);
         if (manager.getWeekNumber() == Constants.FIRST_WEEK) {
-            menu.getItem(0).setIcon(R.drawable.ic_looks_one_red_24dp);
-            menu.getItem(1).setIcon(R.drawable.ic_looks_two_white_24dp);
+            if (manager.getCurrentWeek() == Constants.FIRST_WEEK)
+                weekIcon.setIcon(R.drawable.ic_looks_one_red_24dp);
+            else weekIcon.setIcon(R.drawable.ic_looks_one_white_24dp);
         } else {
-            menu.getItem(0).setIcon(R.drawable.ic_looks_one_white_24dp);
-            menu.getItem(1).setIcon(R.drawable.ic_looks_two_red_24dp);
+            if (manager.getCurrentWeek() == Constants.SECOND_WEEK)
+                weekIcon.setIcon(R.drawable.ic_looks_two_red_24dp);
+            else weekIcon.setIcon(R.drawable.ic_looks_two_white_24dp);
         }
     }
 
@@ -161,7 +174,7 @@ public class ScheduleFragment extends Fragment implements View.OnClickListener {
 
         tabLayout.removeAllTabs();
         for (Integer i : days) {
-            int position = i-1;
+            int position = i - 1;
             if (position >= 0 && position < daysName.length)
                 tabLayout.addTab(tabLayout.newTab().setText(daysName[position]));
         }
@@ -193,4 +206,61 @@ public class ScheduleFragment extends Fragment implements View.OnClickListener {
 
 
     }
+
+
+    private void getWeek() {
+
+        if (NetworkStatusChecker.isNetworkAvailable(getContext())) {
+            // get WeekNumber
+            Loger.LOG("get week");
+            manager.getWeekFromServer().enqueue(new Callback<ResponceWeek>() {
+                @Override
+                public void onResponse(Call<ResponceWeek> call, Response<ResponceWeek> response) {
+                    manager.saveWeek(response.body().getData());
+                    loadSheduleFromDB();
+                }
+
+                @Override
+                public void onFailure(Call<ResponceWeek> call, Throwable t) {
+                    Toast.makeText(getActivity(), "Не знайдено", Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            Toast.makeText(getActivity(), "Перевірте інтернет підлючення", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void getSchedule(final String query) {
+        if (NetworkStatusChecker.isNetworkAvailable(getContext())) {
+            Loger.LOG(query);
+            manager.getSheduleFromServer(query).enqueue(new Callback<ResponceLessons>() {
+                @Override
+                public void onResponse(Call<ResponceLessons> call, Response<ResponceLessons> response) {
+                    if (response.body() != null) {
+                        manager.clearDB();
+                        manager.logIn(query, response.body().getData());
+                        getWeek();
+                    } else {
+                        Toast.makeText(getActivity(), "Не знайдено", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ResponceLessons> call, Throwable t) {
+                    Toast.makeText(getActivity(), "Не знайдено", Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            Toast.makeText(getActivity(), "Перевірте інтернет підлючення", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+    private void loadSheduleFromDB() {
+        manager.loadSchedule();//завантажити розклад з бази
+        setSheduleView();//відобразити розклад
+        setMenuView();//відобразити меню
+        setTitleFragment(manager.getManagerPreferences().readGroupName());
+    }
+
 }

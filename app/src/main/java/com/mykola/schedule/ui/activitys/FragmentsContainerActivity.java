@@ -1,9 +1,11 @@
-package com.mykola.schedule;
+package com.mykola.schedule.ui.activitys;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
+
+import com.mykola.schedule.R;
 
 /**
  * Created by mykola on 04.03.17.

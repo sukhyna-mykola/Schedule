@@ -1,4 +1,4 @@
-package com.mykola.schedule;
+package com.mykola.schedule.data.storage.models;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -9,7 +9,7 @@ import java.util.List;
  * Created by mykola on 31.01.17.
  */
 
-public class Lesson {
+public class LessonDTO {
 
 
     @SerializedName("day_number")
@@ -138,9 +138,9 @@ public class Lesson {
     }
 
 
-    public Lesson(String lessonName, String lessonType, String teacherName, String lessonRoom,
-                  String lessonNumber, String dayNumber, String lessonWeek,
-                  String startTime, String endTime) {
+    public LessonDTO(String lessonName, String lessonType, String teacherName, String lessonRoom,
+                     String lessonNumber, String dayNumber, String lessonWeek,
+                     String startTime, String endTime) {
         this.lessonName = lessonName;
         this.lessonType = lessonType;
         this.teacherName = teacherName;

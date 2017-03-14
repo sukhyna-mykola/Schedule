@@ -1,10 +1,13 @@
-package com.mykola.schedule;
+package com.mykola.schedule.data.managers;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
+
+import com.mykola.schedule.data.database.DBHelper;
+import com.mykola.schedule.data.storage.models.LessonDTO;
+import com.mykola.schedule.utils.Constants;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -15,34 +18,15 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * Created by mykola on 16.01.17.
+ * Created by mykola on 14.03.17.
  */
 
-class DBHelper extends SQLiteOpenHelper {
+public class DBManager {
 
-    public DBHelper(Context context) {
-        super(context, Constants.DB_NAME, null, 1);
-    }
+    private DBHelper dbHelper;
 
-    @Override
-    public void onCreate(SQLiteDatabase db) {
-
-        db.execSQL("create table " + Constants.TABLE_NAME + " ("
-                + Constants.LESSON_WEEK + " " + Constants.INTEGER + ","
-                + Constants.LESSON_NAME + " " + Constants.TEXT + ","
-                + Constants.LESSON_NUMBER + " " + Constants.INTEGER + ","
-                + Constants.LESSON_ROOM + " " + Constants.TEXT + ","
-                + Constants.LESSON_TYPE + " " + Constants.TEXT + ","
-                + Constants.TEACHER_NAME + " " + Constants.TEXT + ","
-                + Constants.TIME_START + " " + Constants.TEXT + ","
-                + Constants.TIME_END + " " + Constants.TEXT + ","
-                + Constants.DAY_NUMBER + " " + Constants.INTEGER +
-                ");");
-    }
-
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
+    public DBManager(Context context){
+        dbHelper = new DBHelper(context);
     }
 
     /**
@@ -50,12 +34,12 @@ class DBHelper extends SQLiteOpenHelper {
      * @param weekNumber = номер тижня
      * @return HashMap предметів, де key-номер дня в тижні, value-список предметів в цей день
      */
-    public HashMap<Integer, List<Lesson>> readLessonsFromDB(int weekNumber) {
+    public HashMap<Integer, List<LessonDTO>> readLessonsFromDB(int weekNumber) {
 
-        HashMap<Integer, List<Lesson>> lessonsOfWeek = new HashMap<>();
-        List<Lesson> lessonsOfDay;
+        HashMap<Integer, List<LessonDTO>> lessonsOfWeek = new HashMap<>();
+        List<LessonDTO> lessonsOfDay;
 
-        SQLiteDatabase db = getWritableDatabase();
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
 //
@@ -93,7 +77,7 @@ class DBHelper extends SQLiteOpenHelper {
                     String start = c.getString(startColIndex);
                     String end = c.getString(endlIndex);
 
-                    Lesson lesson = new Lesson(name, type, teacher, room, number, day, week, start, end);
+                    LessonDTO lesson = new LessonDTO(name, type, teacher, room, number, day, week, start, end);
                     lessonsOfDay.add(lesson);
                     try {
                         Date startTime = df.parse(lesson.getTimeStart());
@@ -130,9 +114,9 @@ class DBHelper extends SQLiteOpenHelper {
      *
      * @param lesson - дані для запису
      */
-    public void putLessonIntoDB(Lesson lesson) {
+    public void putLessonIntoDB(LessonDTO lesson) {
         ContentValues cv = new ContentValues();
-        SQLiteDatabase db = getWritableDatabase();
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         cv.put(Constants.TEACHER_NAME, lesson.getTeacherName());
         cv.put(Constants.LESSON_NAME, lesson.getLessonName());
@@ -152,9 +136,8 @@ class DBHelper extends SQLiteOpenHelper {
      * Видаляє всі записи з бази даних
      */
     public void clearDB() {
-        SQLiteDatabase db = getWritableDatabase();
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.delete(Constants.TABLE_NAME, null, null);
         db.close();
     }
 }
-
