@@ -22,7 +22,7 @@ public class PreferencesManager {
         return sPref.getBoolean(Constants.LOGIN_KEY, false);
     }
 
-    public boolean readParityWeek() {
+    public boolean readConformityWeek() {
         return sPref.getBoolean(Constants.PARITY_WEEK_KEY, false);
     }
 
@@ -31,7 +31,7 @@ public class PreferencesManager {
     }
 
 
-    public void saveParityWeek(boolean parity) {
+    public void saveConformityWeek(boolean parity) {
         SharedPreferences.Editor ed = sPref.edit();
         ed.putBoolean(Constants.PARITY_WEEK_KEY, parity);
         ed.commit();

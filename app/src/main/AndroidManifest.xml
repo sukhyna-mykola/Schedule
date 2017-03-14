@@ -22,7 +22,7 @@
         </activity>
         <activity
             android:name=".ui.activitys.SearchActivity"
-            android:windowSoftInputMode="adjustResize">
+            >
 
         </activity>
     </application>

@@ -8,10 +8,12 @@ import com.mykola.schedule.data.network.pojo.ResponceSearchGroups;
 import com.mykola.schedule.data.network.pojo.ResponceWeek;
 import com.mykola.schedule.data.storage.models.LessonDTO;
 import com.mykola.schedule.utils.Constants;
+import com.mykola.schedule.utils.Loger;
 
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import retrofit2.Call;
 
@@ -96,9 +98,31 @@ public class ScheduleManager {
     }
 
     public void saveWeek(int week) {
-        if (week == Constants.FIRST_WEEK)
-            managerPreferences.saveParityWeek(false);
-        else managerPreferences.saveParityWeek(true);
+        Calendar c = Calendar.getInstance(Locale.UK);
+        int weekReal = c.get(Calendar.WEEK_OF_YEAR);
+
+        /**
+         * Якщо зараз парний тиждень в дійсності
+         *      якщо парний по розкраду -
+         *           відповідність  = true;
+         *      інакще -
+         *          відповідність  = false;
+         * інакше
+         *      якщо парний по розкраду -
+         *           відповідність  = false;
+         *      інакще -
+         *          відповідність  = true;
+         */
+        if (weekReal%2==0) {
+            if (week % 2 == 0) {
+                managerPreferences.saveConformityWeek(true);
+            } else managerPreferences.saveConformityWeek(false);
+        } else {
+            if (week % 2 == 0) {
+                managerPreferences.saveConformityWeek(false);
+            } else managerPreferences.saveConformityWeek(true);
+        }
+
     }
 
     public void logOut() {
@@ -124,11 +148,13 @@ public class ScheduleManager {
 
 
     private void determineNumberWeek() {
-        Calendar c = Calendar.getInstance();
+        Calendar c = Calendar.getInstance(Locale.UK);
         int week = c.get(Calendar.WEEK_OF_YEAR);
+        Loger.LOG("week = "+week);
         
-        boolean parity = managerPreferences.readParityWeek();
-        if (parity) {
+        boolean conformity = managerPreferences.readConformityWeek();
+        Loger.LOG("Conformity = "+conformity);
+        if (conformity) {
             if (week % 2 == 0) {
                 weekNumber = Constants.SECOND_WEEK;
             } else weekNumber = Constants.FIRST_WEEK;

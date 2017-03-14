@@ -153,16 +153,13 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Ad
                         getActivity().setResult(RESULT_OK, intent);
                         getActivity().finish();
                     } else {
-                        Toast.makeText(getActivity(), "Не знайдено", Toast.LENGTH_SHORT).show();
+                        notFound();
                     }
                 }
 
                 @Override
                 public void onFailure(Call<ResponceWeek> call, Throwable t) {
-                    Toast.makeText(getActivity(), "Не знайдено", Toast.LENGTH_SHORT).show();
-                    progressBar.setVisibility(View.GONE);
-                    buttonRequest.setVisibility(View.VISIBLE);
-                    itemList.setVisibility(View.VISIBLE);
+                    notFound();
                 }
             });
         } else {
@@ -170,6 +167,13 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Ad
         }
     }
 
+
+    private void notFound(){
+        Toast.makeText(getActivity(), "Не знайдено", Toast.LENGTH_SHORT).show();
+        progressBar.setVisibility(View.GONE);
+        buttonRequest.setVisibility(View.VISIBLE);
+        itemList.setVisibility(View.VISIBLE);
+    }
 
     private void getSchedule(final String query) {
         if (NetworkStatusChecker.isNetworkAvailable(getContext())) {
@@ -185,16 +189,13 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Ad
                         manager.logIn(query, response.body().getData());
                         getWeek();
                     } else {
-                        Toast.makeText(getActivity(), "Не знайдено", Toast.LENGTH_SHORT).show();
+                        notFound();
                     }
                 }
 
                 @Override
                 public void onFailure(Call<ResponceLessons> call, Throwable t) {
-                    Toast.makeText(getActivity(), "Не знайдено", Toast.LENGTH_SHORT).show();
-                    progressBar.setVisibility(View.GONE);
-                    buttonRequest.setVisibility(View.VISIBLE);
-                    itemList.setVisibility(View.VISIBLE);
+                    notFound();
                 }
             });
         } else {
