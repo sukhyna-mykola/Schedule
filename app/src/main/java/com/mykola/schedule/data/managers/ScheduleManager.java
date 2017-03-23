@@ -10,7 +10,11 @@ import com.mykola.schedule.data.storage.models.LessonDTO;
 import com.mykola.schedule.utils.Constants;
 import com.mykola.schedule.utils.Loger;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -113,7 +117,7 @@ public class ScheduleManager {
          *      інакще -
          *          відповідність  = true;
          */
-        if (weekReal%2==0) {
+        if (weekReal % 2 == 0) {
             if (week % 2 == 0) {
                 managerPreferences.saveConformityWeek(true);
             } else managerPreferences.saveConformityWeek(false);
@@ -140,20 +144,25 @@ public class ScheduleManager {
     public void loadSchedule() {
         determineNumberWeek();
         setLessons(managerDB.readLessonsFromDB(weekNumber));
+        determinateLessons();
     }
+
 
     public void loadScheduleOfWeek() {
         setLessons(managerDB.readLessonsFromDB(weekNumber));
+        determinateLessons();
     }
 
-
+    /**
+     * Визначає номер тижня
+     */
     private void determineNumberWeek() {
         Calendar c = Calendar.getInstance(Locale.UK);
         int week = c.get(Calendar.WEEK_OF_YEAR);
-        Loger.LOG("week = "+week);
-        
+        Loger.LOG("week = " + week);
+
         boolean conformity = managerPreferences.readConformityWeek();
-        Loger.LOG("Conformity = "+conformity);
+        Loger.LOG("Conformity = " + conformity);
         if (conformity) {
             if (week % 2 == 0) {
                 weekNumber = Constants.SECOND_WEEK;
@@ -164,6 +173,41 @@ public class ScheduleManager {
             } else weekNumber = Constants.SECOND_WEEK;
         }
         currentWeek = weekNumber;
+    }
+
+
+    /**
+     * Визначає поточний день та поточну пару
+     */
+    private void determinateLessons() {
+
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
+
+        int currentDay = calendar.get(Calendar.DAY_OF_WEEK) - 1;
+
+        for (Collection<LessonDTO> tLessons : lessons.values()) {
+            for (LessonDTO lesson : tLessons) {
+                try {
+                    Date startTime = df.parse(lesson.getTimeStart());
+                    Date endTime = df.parse(lesson.getTimeEnd());
+                    Date thisTime = df.parse(df.format(calendar.getTime()));
+
+                    if ((currentDay == Integer.parseInt(lesson.getDayNumber())) &&
+                            (Integer.parseInt(lesson.getLessonWeek()) == currentWeek)) {
+                        if (thisTime.after(startTime) && thisTime.before(endTime)) {
+                            lesson.setCurrentLesson(true);
+                        }
+
+                        lesson.setCurrentDay(true);
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }
+
     }
 
 

@@ -70,6 +70,8 @@ public class LessonsAdapter extends RecyclerView.Adapter<LessonsAdapter.ViewHold
                 holder.timeLesson.setText(lesson.getTimeStart() + " - " + lesson.getTimeEnd());
             }
 
+
+
             if (lesson.isCurrentDay()) {
                 holder.cardView.setCardBackgroundColor(Color.YELLOW);
             }

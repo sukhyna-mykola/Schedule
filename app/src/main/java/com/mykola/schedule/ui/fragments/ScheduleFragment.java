@@ -179,6 +179,8 @@ public class ScheduleFragment extends Fragment implements View.OnClickListener {
                 tabLayout.addTab(tabLayout.newTab().setText(daysName[position]));
         }
 
+
+
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -204,7 +206,6 @@ public class ScheduleFragment extends Fragment implements View.OnClickListener {
         viewPager.setAdapter(adapter);
         viewPager.setCurrentItem(days.indexOf(day));
 
-
     }
 
 
@@ -222,11 +223,11 @@ public class ScheduleFragment extends Fragment implements View.OnClickListener {
 
                 @Override
                 public void onFailure(Call<ResponceWeek> call, Throwable t) {
-                    Toast.makeText(getActivity(), "Не знайдено", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), R.string.not_found, Toast.LENGTH_SHORT).show();
                 }
             });
         } else {
-            Toast.makeText(getActivity(), "Перевірте інтернет підлючення", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), R.string.no_internet, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -241,17 +242,17 @@ public class ScheduleFragment extends Fragment implements View.OnClickListener {
                         manager.logIn(query, response.body().getData());
                         getWeek();
                     } else {
-                        Toast.makeText(getActivity(), "Не знайдено", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), R.string.not_found, Toast.LENGTH_SHORT).show();
                     }
                 }
 
                 @Override
                 public void onFailure(Call<ResponceLessons> call, Throwable t) {
-                    Toast.makeText(getActivity(), "Не знайдено", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(),  R.string.not_found, Toast.LENGTH_SHORT).show();
                 }
             });
         } else {
-            Toast.makeText(getActivity(), "Перевірте інтернет підлючення", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), R.string.no_internet, Toast.LENGTH_SHORT).show();
         }
     }
 

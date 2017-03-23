@@ -163,13 +163,13 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Ad
                 }
             });
         } else {
-            Toast.makeText(getActivity(), "Перевірте інтернет підлючення", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(),  R.string.no_internet, Toast.LENGTH_SHORT).show();
         }
     }
 
 
     private void notFound(){
-        Toast.makeText(getActivity(), "Не знайдено", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(),  R.string.not_found, Toast.LENGTH_SHORT).show();
         progressBar.setVisibility(View.GONE);
         buttonRequest.setVisibility(View.VISIBLE);
         itemList.setVisibility(View.VISIBLE);
@@ -199,7 +199,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener, Ad
                 }
             });
         } else {
-            Toast.makeText(getActivity(), "Перевірте інтернет підлючення", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(),  R.string.no_internet, Toast.LENGTH_SHORT).show();
         }
     }
 

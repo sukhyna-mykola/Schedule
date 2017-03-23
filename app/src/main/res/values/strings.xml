@@ -10,4 +10,6 @@
     </string-array>
     <string name="input_group_name">Введіть назву групи</string>
     <string name="title">Група %1$s</string>
+    <string name="not_found">Не знайдено</string>
+    <string name="no_internet">Перевірте інтернет підлючення</string>
 </resources>

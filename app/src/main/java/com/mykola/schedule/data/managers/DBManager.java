@@ -40,9 +40,7 @@ public class DBManager {
         List<LessonDTO> lessonsOfDay;
 
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
-//
+
         for (int i = 1; i <= 6; i++) {
 
             lessonsOfDay = new ArrayList<>();
@@ -50,7 +48,6 @@ public class DBManager {
             Cursor c = db.query(Constants.TABLE_NAME, null, Constants.DAY_NUMBER + "=? AND " + Constants.LESSON_WEEK + "=?",
                     new String[]{String.valueOf(i), String.valueOf(weekNumber)}, null, null, null);
 
-            // int day = calendar.get(Calendar.DAY_OF_WEEK) - 1;
 
             if (c.moveToFirst()) {
 
@@ -79,22 +76,6 @@ public class DBManager {
 
                     LessonDTO lesson = new LessonDTO(name, type, teacher, room, number, day, week, start, end);
                     lessonsOfDay.add(lesson);
-                    try {
-                        Date startTime = df.parse(lesson.getTimeStart());
-                        Date endTime = df.parse(lesson.getTimeEnd());
-                        Date thisTime = df.parse(df.format(calendar.getTime()));
-/*
-                    if ((day == Integer.parseInt(lesson.getDayNumber())) && (Integer.parseInt(lesson.getLessonWeek()) == currentWeek)) {
-                        if (thisTime.after(start) && thisTime.before(end)) {
-                            lesson.setCurrentLesson(true);
-                        }
-
-                        lesson.setCurrentDay(true);
-                    }*/
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-
 
                 } while (c.moveToNext());
             }
