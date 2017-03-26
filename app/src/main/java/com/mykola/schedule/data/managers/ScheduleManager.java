@@ -153,6 +153,7 @@ public class ScheduleManager {
         determinateLessons();
     }
 
+
     /**
      * Визначає номер тижня
      */
@@ -181,8 +182,9 @@ public class ScheduleManager {
      */
     private void determinateLessons() {
 
+
         Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
+        SimpleDateFormat df = new SimpleDateFormat("HH:mm");
 
         int currentDay = calendar.get(Calendar.DAY_OF_WEEK) - 1;
 

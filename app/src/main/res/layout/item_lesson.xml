@@ -14,47 +14,71 @@
             android:layout_height="wrap_content">
 
             <TextView
-                android:textSize="25sp"
-                android:layout_margin="16dp"
                 android:id="@+id/number_lesson"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
-                android:layout_centerVertical="true" />
+                android:layout_centerVertical="true"
+                android:layout_margin="16dp"
+                android:textSize="25sp" />
 
             <TextView
-                android:textSize="22sp"
                 android:id="@+id/name_lesson"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/number_lesson" />
+                android:layout_toRightOf="@+id/number_lesson"
+                android:textSize="22sp" />
 
             <TextView
-                android:textSize="18sp"
-                android:textColor="@color/colorAccent"
                 android:id="@+id/teather_lesson"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/name_lesson"
-                android:layout_toRightOf="@+id/number_lesson" />
-
-            <TextView
-                android:typeface="monospace"
-                android:id="@+id/room_lesson"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/teather_lesson"
-                android:layout_toRightOf="@+id/number_lesson" />
-
-            <TextView
+                android:layout_toRightOf="@+id/number_lesson"
                 android:textColor="@color/colorAccent"
-                android:typeface="monospace"
-                android:id="@+id/time_lesson"
-                android:layout_alignParentRight="true"
+                android:textSize="18sp" />
+
+            <LinearLayout
+                android:id="@+id/room_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/teather_lesson"
-                android:layout_toLeftOf="@+id/room_lesson" />
+                android:layout_toRightOf="@+id/number_lesson"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_place_black_24dp" />
+
+                <TextView
+                    android:id="@+id/room_lesson"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:typeface="monospace" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/teather_lesson"
+                android:layout_toLeftOf="@+id/room_layout"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/time_lesson"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/colorAccent"
+                    android:typeface="monospace" />
+            </LinearLayout>
+
+
         </RelativeLayout>
     </android.support.v7.widget.CardView>
 

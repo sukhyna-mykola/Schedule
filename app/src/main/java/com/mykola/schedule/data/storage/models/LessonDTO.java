@@ -2,14 +2,13 @@ package com.mykola.schedule.data.storage.models;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-
-import java.util.List;
+import com.mykola.schedule.utils.Constants;
 
 /**
  * Created by mykola on 31.01.17.
  */
 
-public class LessonDTO {
+public class LessonDTO implements Comparable<LessonDTO> {
 
 
     @SerializedName("day_number")
@@ -139,8 +138,7 @@ public class LessonDTO {
 
 
     public LessonDTO(String lessonName, String lessonType, String teacherName, String lessonRoom,
-                     String lessonNumber, String dayNumber, String lessonWeek,
-                     String startTime, String endTime) {
+                     String lessonNumber, String dayNumber, String lessonWeek) {
         this.lessonName = lessonName;
         this.lessonType = lessonType;
         this.teacherName = teacherName;
@@ -148,7 +146,16 @@ public class LessonDTO {
         this.lessonNumber = lessonNumber;
         this.lessonWeek = lessonWeek;
         this.dayNumber = dayNumber;
-        this.timeStart = startTime;
-        this.timeEnd = endTime;
+
+        String[] times = Constants.times.get(Integer.parseInt(lessonNumber)).split("-");
+        this.timeStart = times[0];
+        this.timeEnd = times[1];
+
+    }
+
+
+    @Override
+    public int compareTo(LessonDTO o) {
+        return Integer.parseInt(getLessonNumber()) - Integer.parseInt(o.getLessonNumber());
     }
 }

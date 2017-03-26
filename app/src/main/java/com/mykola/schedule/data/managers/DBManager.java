@@ -13,6 +13,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -58,9 +59,6 @@ public class DBManager {
                 int roomColIndex = c.getColumnIndex(Constants.LESSON_ROOM);
                 int numberColIndex = c.getColumnIndex(Constants.LESSON_NUMBER);
                 int weekColIndex = c.getColumnIndex(Constants.LESSON_WEEK);
-                int startColIndex = c.getColumnIndex(Constants.TIME_START);
-                int endlIndex = c.getColumnIndex(Constants.TIME_END);
-
 
                 do {
 
@@ -71,17 +69,17 @@ public class DBManager {
                     String number = c.getString(numberColIndex);
                     String day = c.getString(dayColIndex);
                     String week = c.getString(weekColIndex);
-                    String start = c.getString(startColIndex);
-                    String end = c.getString(endlIndex);
 
-                    LessonDTO lesson = new LessonDTO(name, type, teacher, room, number, day, week, start, end);
+                    LessonDTO lesson = new LessonDTO(name, type, teacher, room, number, day, week);
                     lessonsOfDay.add(lesson);
 
                 } while (c.moveToNext());
             }
             c.close();
-            if (lessonsOfDay.size() > 0)
+            if (lessonsOfDay.size() > 0){
+                Collections.sort(lessonsOfDay);
                 lessonsOfWeek.put(i, lessonsOfDay);
+            }
         }
 
         db.close();
@@ -106,8 +104,6 @@ public class DBManager {
         cv.put(Constants.LESSON_TYPE, lesson.getLessonType());
         cv.put(Constants.DAY_NUMBER, lesson.getDayNumber());
         cv.put(Constants.LESSON_WEEK, lesson.getLessonWeek());
-        cv.put(Constants.TIME_END, lesson.getTimeEnd());
-        cv.put(Constants.TIME_START, lesson.getTimeStart());
 
         db.insert(Constants.TABLE_NAME, null, cv);
         db.close();
@@ -119,6 +115,37 @@ public class DBManager {
     public void clearDB() {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.delete(Constants.TABLE_NAME, null, null);
+        db.close();
+    }
+
+    /**
+     * Видаляє запис з бази даних по фільтру
+     */
+    public void removeLessonFromDB(LessonDTO lesson) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        db.delete(Constants.TABLE_NAME,Constants.LESSON_WEEK+"=? AND "+Constants.DAY_NUMBER +
+                "=? AND "+Constants.LESSON_NUMBER+"=?",new String[]{lesson.getLessonWeek(),lesson.getDayNumber(),lesson.getLessonNumber()});
+        db.close();
+    }
+
+    /**
+     * Оновлює запис в базі по фільтру
+     * @param lesson
+     */
+    public void updateLessonInDB(LessonDTO lesson) {
+        ContentValues cv = new ContentValues();
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        cv.put(Constants.TEACHER_NAME, lesson.getTeacherName());
+        cv.put(Constants.LESSON_NAME, lesson.getLessonName());
+        cv.put(Constants.LESSON_NUMBER, lesson.getLessonNumber());
+        cv.put(Constants.LESSON_ROOM, lesson.getLessonRoom());
+        cv.put(Constants.LESSON_TYPE, lesson.getLessonType());
+        cv.put(Constants.DAY_NUMBER, lesson.getDayNumber());
+        cv.put(Constants.LESSON_WEEK, lesson.getLessonWeek());
+
+        db.update(Constants.TABLE_NAME,cv,Constants.LESSON_WEEK+"=? AND "+Constants.DAY_NUMBER +
+                "=? AND "+Constants.LESSON_NUMBER+"=?",new String[]{lesson.getLessonWeek(),lesson.getDayNumber(),lesson.getLessonNumber()});
         db.close();
     }
 }

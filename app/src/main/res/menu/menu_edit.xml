@@ -5,12 +5,7 @@
     <item
         android:id="@+id/week"
         android:icon="@drawable/ic_looks_one_white_24dp"
-        android:title="Title"
+        android:title=""
         app:showAsAction="always" />
-    <item
-        android:id="@+id/search"
-        android:title="Змінити групу" />
-    <item
-        android:id="@+id/update"
-        android:title="Оновити розклад" />
+
 </menu>

@@ -1,0 +1,19 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.mykola.schedule.ui.activitys.ScheduleActivity">
+    <item
+        android:id="@+id/week"
+        android:icon="@drawable/ic_looks_one_white_24dp"
+        android:title="Week"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/search"
+        android:title="@string/change_groupe" />
+    <item
+        android:id="@+id/update"
+        android:title="@string/update" />
+    <item
+        android:id="@+id/edit"
+        android:title="@string/edit" />
+</menu>

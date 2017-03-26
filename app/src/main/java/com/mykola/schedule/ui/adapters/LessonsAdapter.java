@@ -9,9 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.mykola.schedule.data.storage.models.LessonDTO;
 import com.mykola.schedule.R;
 import com.mykola.schedule.data.managers.ScheduleManager;
+import com.mykola.schedule.data.storage.models.LessonDTO;
 
 import java.util.ArrayList;
 
@@ -21,7 +21,7 @@ import java.util.ArrayList;
 
 public class LessonsAdapter extends RecyclerView.Adapter<LessonsAdapter.ViewHolder> {
     private ArrayList<LessonDTO> lessons;
-    private  Context context;
+    private Context context;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView nameLesson;
@@ -64,13 +64,7 @@ public class LessonsAdapter extends RecyclerView.Adapter<LessonsAdapter.ViewHold
             holder.roomLesson.setText(lesson.getLessonRoom());
             holder.teatherLesson.setText(lesson.getTeacherName());
             holder.nameLesson.setText(lesson.getLessonName() + "(" + lesson.getLessonType() + ")");
-            try {
-                holder.timeLesson.setText(lesson.getTimeStart().substring(0, 5) + " - " + lesson.getTimeEnd().substring(0, 5));
-            } catch (Exception e) {
-                holder.timeLesson.setText(lesson.getTimeStart() + " - " + lesson.getTimeEnd());
-            }
-
-
+            holder.timeLesson.setText(lesson.getTimeStart() + " - " + lesson.getTimeEnd());
 
             if (lesson.isCurrentDay()) {
                 holder.cardView.setCardBackgroundColor(Color.YELLOW);

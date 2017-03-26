@@ -12,4 +12,22 @@
     <string name="title">Група %1$s</string>
     <string name="not_found">Не знайдено</string>
     <string name="no_internet">Перевірте інтернет підлючення</string>
+    <string name="schedule_updated">Розклад оновлено</string>
+    <string name="loading">Завантаження</string>
+    <string name="yes">Так</string>
+    <string name="no">Ні</string>
+    <string name="add_lesson">Додати пару</string>
+    <string name="warning">Попередження</string>
+    <string name="alredy_exist_lesson">В даномі місці вже є пара. Хочете замінити?</string>
+    <string name="select_cell">Виберіть комірку куди перемістити</string>
+    <string name="remove">Видалити!</string>
+    <string name="realy">Ви впевнені?</string>
+    <string name="edit_lesson">Редагувати пару</string>
+    <string name="th_week">-й тиждень</string>
+    <string name="time_lesson">"Час - "</string>
+    <string name="ok">OK</string>
+    <string name="number_lesson">"Номер лекції - "</string>
+    <string name="change_groupe">Змінити групу</string>
+    <string name="update">Оновити розклад</string>
+    <string name="edit">Редагувати розклад</string>
 </resources>

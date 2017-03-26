@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -19,8 +20,10 @@ import com.mykola.schedule.R;
 import com.mykola.schedule.data.managers.ScheduleManager;
 import com.mykola.schedule.data.network.pojo.ResponceLessons;
 import com.mykola.schedule.data.network.pojo.ResponceWeek;
+import com.mykola.schedule.ui.activitys.EditScheduleActivity;
 import com.mykola.schedule.ui.activitys.SearchActivity;
 import com.mykola.schedule.ui.adapters.PagerAdapter;
+import com.mykola.schedule.ui.dialogs.ProgressDialog;
 import com.mykola.schedule.utils.Constants;
 import com.mykola.schedule.utils.Loger;
 import com.mykola.schedule.utils.NetworkStatusChecker;
@@ -69,6 +72,7 @@ public class ScheduleFragment extends Fragment implements View.OnClickListener {
         setHasOptionsMenu(true);
     }
 
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -78,10 +82,11 @@ public class ScheduleFragment extends Fragment implements View.OnClickListener {
 
         manager = ScheduleManager.get(getActivity());
 
-        if (manager.getManagerPreferences().readStatusLogin() == true) {
+        if (manager.getManagerPreferences().readStatusLogin()) {
             manager.loadSchedule();
             setSheduleView();
             setTitleFragment(manager.getManagerPreferences().readGroupName());
+
         } else {
             showSearchScreen();
         }
@@ -89,11 +94,16 @@ public class ScheduleFragment extends Fragment implements View.OnClickListener {
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        adapter.notifyDataSetChanged();
+    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         this.menu = menu;
-        inflater.inflate(R.menu.menu_main, menu);
+        inflater.inflate(R.menu.menu_schedule, menu);
         setMenuView();
     }
 
@@ -117,9 +127,13 @@ public class ScheduleFragment extends Fragment implements View.OnClickListener {
                 showSearchScreen();
                 break;
             case R.id.update:
+                showDialog();
                 getSchedule(manager.getManagerPreferences().readGroupName());
                 break;
 
+            case R.id.edit:
+                startActivity(new Intent(getActivity(), EditScheduleActivity.class));
+                break;
         }
 
 
@@ -180,7 +194,6 @@ public class ScheduleFragment extends Fragment implements View.OnClickListener {
         }
 
 
-
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -219,15 +232,16 @@ public class ScheduleFragment extends Fragment implements View.OnClickListener {
                 public void onResponse(Call<ResponceWeek> call, Response<ResponceWeek> response) {
                     manager.saveWeek(response.body().getData());
                     loadSheduleFromDB();
+                    hideDialog(getString(R.string.schedule_updated));
                 }
 
                 @Override
                 public void onFailure(Call<ResponceWeek> call, Throwable t) {
-                    Toast.makeText(getActivity(), R.string.not_found, Toast.LENGTH_SHORT).show();
+                    hideDialog(getString(R.string.not_found));
                 }
             });
         } else {
-            Toast.makeText(getActivity(), R.string.no_internet, Toast.LENGTH_SHORT).show();
+            hideDialog(getResources().getString(R.string.no_internet));
         }
     }
 
@@ -242,20 +256,39 @@ public class ScheduleFragment extends Fragment implements View.OnClickListener {
                         manager.logIn(query, response.body().getData());
                         getWeek();
                     } else {
-                        Toast.makeText(getActivity(), R.string.not_found, Toast.LENGTH_SHORT).show();
+                        hideDialog(getString(R.string.not_found));
                     }
                 }
 
                 @Override
                 public void onFailure(Call<ResponceLessons> call, Throwable t) {
-                    Toast.makeText(getActivity(),  R.string.not_found, Toast.LENGTH_SHORT).show();
+                    hideDialog(getString(R.string.not_found));
                 }
             });
         } else {
-            Toast.makeText(getActivity(), R.string.no_internet, Toast.LENGTH_SHORT).show();
+            hideDialog(getString(R.string.no_internet));
         }
     }
 
+
+    private void showDialog() {
+        android.support.v4.app.FragmentManager fm = getActivity().getSupportFragmentManager();
+        DialogFragment dialog = new ProgressDialog();
+        if (fm.findFragmentByTag(Constants.DIALOG_PROGRESS) != null)
+            fm.beginTransaction().remove(fm.findFragmentByTag(Constants.DIALOG_PROGRESS)).commit();
+        dialog.show(fm, Constants.DIALOG_PROGRESS);
+
+
+    }
+
+
+    private void hideDialog(String text) {
+        Toast.makeText(getActivity(), text, Toast.LENGTH_SHORT).show();
+        android.support.v4.app.FragmentManager fm = getActivity().getSupportFragmentManager();
+
+        if (fm.findFragmentByTag(Constants.DIALOG_PROGRESS) != null)
+            fm.beginTransaction().remove(fm.findFragmentByTag(Constants.DIALOG_PROGRESS)).commit();
+    }
 
     private void loadSheduleFromDB() {
         manager.loadSchedule();//завантажити розклад з бази

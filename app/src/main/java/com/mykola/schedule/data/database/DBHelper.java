@@ -37,8 +37,6 @@ public class DBHelper extends SQLiteOpenHelper {
                 + Constants.LESSON_ROOM + " " + Constants.TEXT + ","
                 + Constants.LESSON_TYPE + " " + Constants.TEXT + ","
                 + Constants.TEACHER_NAME + " " + Constants.TEXT + ","
-                + Constants.TIME_START + " " + Constants.TEXT + ","
-                + Constants.TIME_END + " " + Constants.TEXT + ","
                 + Constants.DAY_NUMBER + " " + Constants.INTEGER +
                 ");");
     }
