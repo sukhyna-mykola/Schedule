@@ -1,8 +1,5 @@
 package com.mykola.schedule.data.storage.models;
 
-/**
- * Created by mykola on 24.03.17.
- */
 
 public class EditLecture {
 

@@ -1,9 +1,5 @@
 package com.mykola.schedule.data.network.pojo;
 
-/**
- * Created by mykola on 16.01.17.
- */
-
 
 import java.util.List;
 

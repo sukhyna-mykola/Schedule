@@ -9,9 +9,6 @@ import com.mykola.schedule.data.storage.models.LessonDTO;
 import com.mykola.schedule.ui.views.LessonDialogView;
 import com.mykola.schedule.utils.Constants;
 
-/**
- * Created by mykola on 26.03.17.
- */
 
 public class DialogEdit extends DialogLesson {
 
@@ -19,7 +16,7 @@ public class DialogEdit extends DialogLesson {
     public static DialogLesson newInstance(int position) {
 
         Bundle args = new Bundle();
-        args.putInt(Constants.LECTURE_POSITION, position);
+        args.putInt(LECTURE_POSITION, position);
         DialogLesson fragment = new DialogEdit();
         fragment.setArguments(args);
         return fragment;

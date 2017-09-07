@@ -3,10 +3,6 @@ package com.mykola.schedule.data.network;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-/**
- * Created by mykola on 14.03.17.
- */
-
 public class ServiceBuilder {
 
 

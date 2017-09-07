@@ -2,13 +2,13 @@ package com.mykola.schedule.data.managers;
 
 import android.content.Context;
 
+import com.mykola.schedule.data.network.APICallbacks;
 import com.mykola.schedule.data.network.ServiceBuilder;
 import com.mykola.schedule.data.network.pojo.ResponceLessons;
 import com.mykola.schedule.data.network.pojo.ResponceSearchGroups;
 import com.mykola.schedule.data.network.pojo.ResponceWeek;
 import com.mykola.schedule.data.storage.models.LessonDTO;
 import com.mykola.schedule.utils.Constants;
-import com.mykola.schedule.utils.Loger;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -20,14 +20,14 @@ import java.util.List;
 import java.util.Locale;
 
 import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
-/**
- * Created by mykola on 17.02.17.
- */
 
 public class ScheduleManager {
 
     private HashMap<Integer, List<LessonDTO>> lessons;
+
     private int weekNumber;
     private int currentWeek;
 
@@ -36,53 +36,45 @@ public class ScheduleManager {
 
     private static ScheduleManager manager;
 
-    public DBManager getManagerDB() {
-        return managerDB;
-    }
-
-    public PreferencesManager getManagerPreferences() {
-        return managerPreferences;
-    }
-
-    public HashMap<Integer, List<LessonDTO>> getLessons() {
-        return lessons;
-    }
-
-    public void setLessons(HashMap<Integer, List<LessonDTO>> lessons) {
-        this.lessons = lessons;
-    }
-
-    public int getCurrentWeek() {
-        return currentWeek;
-    }
-
-    public int getWeekNumber() {
-        return weekNumber;
-    }
-
-    public void setWeekNumber(int weekNumber) {
-        this.weekNumber = weekNumber;
-    }
-
-
-    private ScheduleManager(Context context) {
-        managerDB = new DBManager(context);
-        managerPreferences = new PreferencesManager(context);
-    }
-
     public static ScheduleManager get(Context context) {
         if (manager == null)
             manager = new ScheduleManager(context);
         return manager;
     }
 
-
-    public Call<ResponceLessons> getSheduleFromServer(final String name) {
-        return ServiceBuilder.getApi().getLessons(name);
+    private ScheduleManager(Context context) {
+        managerDB = new DBManager(context);
+        managerPreferences = new PreferencesManager(context);
     }
 
-    public Call<ResponceWeek> getWeekFromServer() {
-        return ServiceBuilder.getApi().getWeek();
+
+    public void getSheduleFromServer(final String name, final APICallbacks callbacks) {
+        ServiceBuilder.getApi().getLessons(name).enqueue(new Callback<ResponceLessons>() {
+            @Override
+            public void onResponse(Call<ResponceLessons> call, Response<ResponceLessons> response) {
+                callbacks.onResponseSheduleFromServer(name, call, response);
+            }
+
+            @Override
+            public void onFailure(Call<ResponceLessons> call, Throwable t) {
+                callbacks.onFailureSheduleFromServer(call, t);
+            }
+        });
+
+    }
+
+    public void getWeekFromServer(final APICallbacks callbacks) {
+        ServiceBuilder.getApi().getWeek().enqueue(new Callback<ResponceWeek>() {
+            @Override
+            public void onResponse(Call<ResponceWeek> call, Response<ResponceWeek> response) {
+                callbacks.onResponseWeekFromServer(call, response);
+            }
+
+            @Override
+            public void onFailure(Call<ResponceWeek> call, Throwable t) {
+                callbacks.onFailureWeekFromServer(call, t);
+            }
+        });
     }
 
 
@@ -91,11 +83,22 @@ public class ScheduleManager {
      *
      * @param groupName
      */
-    public Call<ResponceSearchGroups> searchGroups(String groupName) {
+    public void searchGroups(String groupName, final APICallbacks callbacks) {
         String filter = "{'query':'" + groupName + "'}";
-        return ServiceBuilder.getApi().searchGroupsByName(filter);
-    }
+        ServiceBuilder.getApi().searchGroupsByName(filter).enqueue(new Callback<ResponceSearchGroups>() {
 
+            @Override
+            public void onResponse(Call<ResponceSearchGroups> call, Response<ResponceSearchGroups> response) {
+                callbacks.onResponseSearchGroups(call, response);
+            }
+
+            @Override
+            public void onFailure(Call<ResponceSearchGroups> call, Throwable t) {
+                callbacks.onFailureSearchGroups(call, t);
+            }
+        });
+
+    }
 
     public void clearDB() {
         managerDB.clearDB();
@@ -133,26 +136,32 @@ public class ScheduleManager {
         managerPreferences.saveStatusLogin(false);
     }
 
-    public void logIn(String name, List<LessonDTO> lessons) {
+    public void logIn() {
         managerPreferences.saveStatusLogin(true);
+    }
+
+    public boolean readStatusLogin() {
+        return managerPreferences.readStatusLogin();
+    }
+
+    public void putLessonsIntoDB(List<LessonDTO> lessons) {
         for (LessonDTO lessson : lessons) {
             managerDB.putLessonIntoDB(lessson);
         }
+    }
+
+    public void saveGroupName(String name) {
         managerPreferences.saveGroupName(name);
     }
 
-    public void loadSchedule() {
+    public String readGroupName() {
+        return managerPreferences.readGroupName();
+    }
+
+    public void loadScheduleFromDB() {
         determineNumberWeek();
-        setLessons(managerDB.readLessonsFromDB(weekNumber));
-        determinateLessons();
+        loadScheduleOfWeekFromDB();
     }
-
-
-    public void loadScheduleOfWeek() {
-        setLessons(managerDB.readLessonsFromDB(weekNumber));
-        determinateLessons();
-    }
-
 
     /**
      * Визначає номер тижня
@@ -160,10 +169,8 @@ public class ScheduleManager {
     private void determineNumberWeek() {
         Calendar c = Calendar.getInstance(Locale.UK);
         int week = c.get(Calendar.WEEK_OF_YEAR);
-        Loger.LOG("week = " + week);
 
         boolean conformity = managerPreferences.readConformityWeek();
-        Loger.LOG("Conformity = " + conformity);
         if (conformity) {
             if (week % 2 == 0) {
                 weekNumber = Constants.SECOND_WEEK;
@@ -176,12 +183,15 @@ public class ScheduleManager {
         currentWeek = weekNumber;
     }
 
+    public void loadScheduleOfWeekFromDB() {
+        this.lessons = managerDB.readLessonsFromDB(weekNumber);
+        configureLessons();
+    }
 
     /**
      * Визначає поточний день та поточну пару
      */
-    private void determinateLessons() {
-
+    public void configureLessons() {
 
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat df = new SimpleDateFormat("HH:mm");
@@ -210,6 +220,23 @@ public class ScheduleManager {
             }
         }
 
+    }
+
+
+    public HashMap<Integer, List<LessonDTO>> getLessons() {
+        return lessons;
+    }
+
+    public int getCurrentWeek() {
+        return currentWeek;
+    }
+
+    public int getWeekNumber() {
+        return weekNumber;
+    }
+
+    public void setWeekNumber(int weekNumber) {
+        this.weekNumber = weekNumber;
     }
 
 

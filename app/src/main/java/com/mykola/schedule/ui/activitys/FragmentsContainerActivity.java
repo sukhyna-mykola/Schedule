@@ -7,9 +7,6 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.mykola.schedule.R;
 
-/**
- * Created by mykola on 04.03.17.
- */
 
 public abstract class FragmentsContainerActivity extends AppCompatActivity {
     @Override

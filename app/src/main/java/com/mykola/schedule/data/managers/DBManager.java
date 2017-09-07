@@ -7,20 +7,19 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.mykola.schedule.data.database.DBHelper;
 import com.mykola.schedule.data.storage.models.LessonDTO;
-import com.mykola.schedule.utils.Constants;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-/**
- * Created by mykola on 14.03.17.
- */
+import static com.mykola.schedule.data.database.DBHelper.DAY_NUMBER;
+import static com.mykola.schedule.data.database.DBHelper.LESSON_NAME;
+import static com.mykola.schedule.data.database.DBHelper.LESSON_NUMBER;
+import static com.mykola.schedule.data.database.DBHelper.LESSON_ROOM;
+import static com.mykola.schedule.data.database.DBHelper.LESSON_TYPE;
+import static com.mykola.schedule.data.database.DBHelper.LESSON_WEEK;
+import static com.mykola.schedule.data.database.DBHelper.TABLE_NAME;
+import static com.mykola.schedule.data.database.DBHelper.TEACHER_NAME;
 
 public class DBManager {
 
@@ -46,19 +45,19 @@ public class DBManager {
 
             lessonsOfDay = new ArrayList<>();
 
-            Cursor c = db.query(Constants.TABLE_NAME, null, Constants.DAY_NUMBER + "=? AND " + Constants.LESSON_WEEK + "=?",
+            Cursor c = db.query(TABLE_NAME, null, DAY_NUMBER + "=? AND " + LESSON_WEEK + "=?",
                     new String[]{String.valueOf(i), String.valueOf(weekNumber)}, null, null, null);
 
 
             if (c.moveToFirst()) {
 
-                int dayColIndex = c.getColumnIndex(Constants.DAY_NUMBER);
-                int nameColIndex = c.getColumnIndex(Constants.LESSON_NAME);
-                int teacherlColIndex = c.getColumnIndex(Constants.TEACHER_NAME);
-                int typeColIndex = c.getColumnIndex(Constants.LESSON_TYPE);
-                int roomColIndex = c.getColumnIndex(Constants.LESSON_ROOM);
-                int numberColIndex = c.getColumnIndex(Constants.LESSON_NUMBER);
-                int weekColIndex = c.getColumnIndex(Constants.LESSON_WEEK);
+                int dayColIndex = c.getColumnIndex(DAY_NUMBER);
+                int nameColIndex = c.getColumnIndex(LESSON_NAME);
+                int teacherlColIndex = c.getColumnIndex(TEACHER_NAME);
+                int typeColIndex = c.getColumnIndex(LESSON_TYPE);
+                int roomColIndex = c.getColumnIndex(LESSON_ROOM);
+                int numberColIndex = c.getColumnIndex(LESSON_NUMBER);
+                int weekColIndex = c.getColumnIndex(LESSON_WEEK);
 
                 do {
 
@@ -97,15 +96,15 @@ public class DBManager {
         ContentValues cv = new ContentValues();
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        cv.put(Constants.TEACHER_NAME, lesson.getTeacherName());
-        cv.put(Constants.LESSON_NAME, lesson.getLessonName());
-        cv.put(Constants.LESSON_NUMBER, lesson.getLessonNumber());
-        cv.put(Constants.LESSON_ROOM, lesson.getLessonRoom());
-        cv.put(Constants.LESSON_TYPE, lesson.getLessonType());
-        cv.put(Constants.DAY_NUMBER, lesson.getDayNumber());
-        cv.put(Constants.LESSON_WEEK, lesson.getLessonWeek());
+        cv.put(TEACHER_NAME, lesson.getTeacherName());
+        cv.put(LESSON_NAME, lesson.getLessonName());
+        cv.put(LESSON_NUMBER, lesson.getLessonNumber());
+        cv.put(LESSON_ROOM, lesson.getLessonRoom());
+        cv.put(LESSON_TYPE, lesson.getLessonType());
+        cv.put(DAY_NUMBER, lesson.getDayNumber());
+        cv.put(LESSON_WEEK, lesson.getLessonWeek());
 
-        db.insert(Constants.TABLE_NAME, null, cv);
+        db.insert(TABLE_NAME, null, cv);
         db.close();
     }
 
@@ -114,7 +113,7 @@ public class DBManager {
      */
     public void clearDB() {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        db.delete(Constants.TABLE_NAME, null, null);
+        db.delete(TABLE_NAME, null, null);
         db.close();
     }
 
@@ -123,8 +122,8 @@ public class DBManager {
      */
     public void removeLessonFromDB(LessonDTO lesson) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        db.delete(Constants.TABLE_NAME,Constants.LESSON_WEEK+"=? AND "+Constants.DAY_NUMBER +
-                "=? AND "+Constants.LESSON_NUMBER+"=?",new String[]{lesson.getLessonWeek(),lesson.getDayNumber(),lesson.getLessonNumber()});
+        db.delete(TABLE_NAME,LESSON_WEEK+"=? AND "+DAY_NUMBER +
+                "=? AND "+LESSON_NUMBER+"=?",new String[]{lesson.getLessonWeek(),lesson.getDayNumber(),lesson.getLessonNumber()});
         db.close();
     }
 
@@ -136,16 +135,16 @@ public class DBManager {
         ContentValues cv = new ContentValues();
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        cv.put(Constants.TEACHER_NAME, lesson.getTeacherName());
-        cv.put(Constants.LESSON_NAME, lesson.getLessonName());
-        cv.put(Constants.LESSON_NUMBER, lesson.getLessonNumber());
-        cv.put(Constants.LESSON_ROOM, lesson.getLessonRoom());
-        cv.put(Constants.LESSON_TYPE, lesson.getLessonType());
-        cv.put(Constants.DAY_NUMBER, lesson.getDayNumber());
-        cv.put(Constants.LESSON_WEEK, lesson.getLessonWeek());
+        cv.put(TEACHER_NAME, lesson.getTeacherName());
+        cv.put(LESSON_NAME, lesson.getLessonName());
+        cv.put(LESSON_NUMBER, lesson.getLessonNumber());
+        cv.put(LESSON_ROOM, lesson.getLessonRoom());
+        cv.put(LESSON_TYPE, lesson.getLessonType());
+        cv.put(DAY_NUMBER, lesson.getDayNumber());
+        cv.put(LESSON_WEEK, lesson.getLessonWeek());
 
-        db.update(Constants.TABLE_NAME,cv,Constants.LESSON_WEEK+"=? AND "+Constants.DAY_NUMBER +
-                "=? AND "+Constants.LESSON_NUMBER+"=?",new String[]{lesson.getLessonWeek(),lesson.getDayNumber(),lesson.getLessonNumber()});
+        db.update(TABLE_NAME,cv,LESSON_WEEK+"=? AND "+DAY_NUMBER +
+                "=? AND "+LESSON_NUMBER+"=?",new String[]{lesson.getLessonWeek(),lesson.getDayNumber(),lesson.getLessonNumber()});
         db.close();
     }
 }

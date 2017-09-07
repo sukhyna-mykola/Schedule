@@ -1,13 +1,15 @@
 <resources>
     <string name="app_name">Розклад КПІ</string>
+
     <string-array name="days_of_week">
         <item>Понеділок</item>
         <item>Вівторок</item>
         <item>Середа</item>
         <item>Червер</item>
-        <item>Пятниця</item>
+        <item>П\'ятниця</item>
         <item>Субота</item>
     </string-array>
+
     <string name="input_group_name">Введіть назву групи</string>
     <string name="title">Група %1$s</string>
     <string name="not_found">Не знайдено</string>
@@ -23,10 +25,10 @@
     <string name="remove">Видалити!</string>
     <string name="realy">Ви впевнені?</string>
     <string name="edit_lesson">Редагувати пару</string>
-    <string name="th_week">-й тиждень</string>
-    <string name="time_lesson">"Час - "</string>
+    <string name="day_week">%1$s, %2$d-й тиждень</string>
+    <string name="time_lesson">"Час - %1$s"</string>
     <string name="ok">OK</string>
-    <string name="number_lesson">"Номер лекції - "</string>
+    <string name="number_lesson">"Номер лекції - %1$d"</string>
     <string name="change_groupe">Змінити групу</string>
     <string name="update">Оновити розклад</string>
     <string name="edit">Редагувати розклад</string>

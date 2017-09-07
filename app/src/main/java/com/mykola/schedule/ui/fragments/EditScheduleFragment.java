@@ -21,12 +21,9 @@ import com.mykola.schedule.utils.Constants;
 
 import java.util.ArrayList;
 
-/**
- * Created by mykola on 03.03.17.
- */
 
 public class EditScheduleFragment extends Fragment implements CallbackDialog {
-
+    public static final String WEEK_NUMBER = "WEEK_NUMBER";
 
     private RecyclerView.LayoutManager mLayoutManager;
     private RecyclerView.Adapter mAdapter;
@@ -36,9 +33,10 @@ public class EditScheduleFragment extends Fragment implements CallbackDialog {
 
     private Menu menu;
 
-    public static EditScheduleFragment newInstance() {
+    public static EditScheduleFragment newInstance(int weekNumber) {
 
         Bundle args = new Bundle();
+        args.putInt(WEEK_NUMBER, weekNumber);
 
         EditScheduleFragment fragment = new EditScheduleFragment();
         fragment.setArguments(args);
@@ -50,6 +48,12 @@ public class EditScheduleFragment extends Fragment implements CallbackDialog {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
         setHasOptionsMenu(true);
+
+        int weekNumber = getArguments().getInt(WEEK_NUMBER, 1);
+
+        editSheduleManager = EditSheduleManager.getManager(getContext());
+        editSheduleManager.setWeek(weekNumber);
+        editSheduleManager.genareteLessonsByWeek();
     }
 
 
@@ -87,8 +91,8 @@ public class EditScheduleFragment extends Fragment implements CallbackDialog {
         MenuItem weekIcon = menu.findItem(R.id.week);
 
         if (editSheduleManager.getWeek() == Constants.FIRST_WEEK)
-            weekIcon.setIcon(R.drawable.ic_looks_one_red_24dp);
-        else weekIcon.setIcon(R.drawable.ic_looks_two_red_24dp);
+            weekIcon.setIcon(R.drawable.ic_looks_one_white_24dp);
+        else weekIcon.setIcon(R.drawable.ic_looks_two_white_24dp);
 
     }
 
@@ -102,20 +106,17 @@ public class EditScheduleFragment extends Fragment implements CallbackDialog {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_edit_schedule, container, false);
-        editSheduleManager = EditSheduleManager.getManager(getActivity());
-        editSheduleManager.genareteLessonsByWeek();
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.edit_lessons);
         mRecyclerView.setHasFixedSize(true);
 
-        mLayoutManager = new GridLayoutManager(getActivity(), 6);
+        mLayoutManager = new GridLayoutManager(getActivity(), Constants.DAYS_NUMBER);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         setSheduleView();
 
         return view;
     }
-
 
 
     @Override
@@ -127,6 +128,5 @@ public class EditScheduleFragment extends Fragment implements CallbackDialog {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        editSheduleManager.setMoveState(false);
     }
 }

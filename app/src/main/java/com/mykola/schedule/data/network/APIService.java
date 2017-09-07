@@ -9,9 +9,6 @@ import retrofit2.http.GET;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
-/**
- * Created by mykola on 31.01.17.
- */
 
 public interface APIService{
     @GET("groups/{group_name}/lessons")

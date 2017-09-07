@@ -29,10 +29,6 @@ import com.mykola.schedule.ui.dialogs.edit.DialogLesson;
 
 import java.util.ArrayList;
 
-/**
- * Created by mykola on 16.01.17.
- */
-
 public class LecturesAdapter extends RecyclerView.Adapter<LecturesAdapter.ViewHolder> implements PopupMenu.OnMenuItemClickListener {
 
     private static final String DIALOG_CREATE = "DIALOG_CREATE";
@@ -58,7 +54,7 @@ public class LecturesAdapter extends RecyclerView.Adapter<LecturesAdapter.ViewHo
                 return true;
             case R.id.move:
                 Toast.makeText(context, R.string.select_cell, Toast.LENGTH_SHORT).show();
-                manager.runMove(selectedPosition);
+                manager.startMove(selectedPosition);
                 callback.update();
                 return true;
             case R.id.remove:
@@ -108,14 +104,14 @@ public class LecturesAdapter extends RecyclerView.Adapter<LecturesAdapter.ViewHo
     @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
-        final EditLecture lesson = lessons.get(position);
+        final EditLecture lecture = lessons.get(position);
 
 
-        if (lesson.getLesson() != null) {
+        if (lecture.getLesson() != null) {
             holder.cardView.setCardBackgroundColor(Color.GREEN);
-            holder.lessonNumber.setText(String.valueOf(lesson.getLessonNumber()));
-            holder.lessonName.setText(lesson.getLesson().getLessonName());
-            holder.lessonType.setText(lesson.getLesson().getLessonType());
+            holder.lessonNumber.setText(String.valueOf(lecture.getLessonNumber()));
+            holder.lessonName.setText(lecture.getLesson().getLessonName());
+            holder.lessonType.setText(lecture.getLesson().getLessonType());
 
             holder.lessonNumber.setVisibility(View.VISIBLE);
             holder.lessonType.setVisibility(View.VISIBLE);
@@ -139,7 +135,7 @@ public class LecturesAdapter extends RecyclerView.Adapter<LecturesAdapter.ViewHo
                 selectedPosition = position;
 
                 if (!manager.isMoveState()) {
-                    if (lesson.getLesson() != null) {
+                    if (lecture.getLesson() != null) {
                         showPopup(v);
 
                     } else {
@@ -147,7 +143,7 @@ public class LecturesAdapter extends RecyclerView.Adapter<LecturesAdapter.ViewHo
 
                     }
                 } else {
-                    if (lesson.getLesson() != null) {
+                    if (lecture.getLesson() != null) {
                         showDialog(DialogMoveWarning.newInstance(selectedPosition),DIALOG_MOVE_WARNING);
                     } else {
                         manager.endMove(selectedPosition);

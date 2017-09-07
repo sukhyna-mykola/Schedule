@@ -15,10 +15,6 @@ import com.mykola.schedule.data.storage.models.LessonDTO;
 
 import java.util.ArrayList;
 
-/**
- * Created by mykola on 16.01.17.
- */
-
 public class LessonsAdapter extends RecyclerView.Adapter<LessonsAdapter.ViewHolder> {
     private ArrayList<LessonDTO> lessons;
     private Context context;

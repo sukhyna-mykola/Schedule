@@ -9,9 +9,7 @@ import com.mykola.schedule.R;
 import com.mykola.schedule.data.storage.models.EditLecture;
 import com.mykola.schedule.utils.Constants;
 
-/**
- * Created by mykola on 26.03.17.
- */
+
 
 public class DialogMoveWarning extends DialogLesson {
 
@@ -19,7 +17,7 @@ public class DialogMoveWarning extends DialogLesson {
     public static DialogLesson newInstance(int position) {
 
         Bundle args = new Bundle();
-        args.putInt(Constants.LECTURE_POSITION, position);
+        args.putInt(LECTURE_POSITION, position);
         DialogLesson fragment = new DialogMoveWarning();
         fragment.setArguments(args);
         return fragment;

@@ -4,21 +4,18 @@ import android.content.Context;
 
 import com.mykola.schedule.data.storage.models.EditLecture;
 import com.mykola.schedule.data.storage.models.LessonDTO;
+import com.mykola.schedule.utils.Constants;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-/**
- * Created by mykola on 24.03.17.
- */
 
 public class EditSheduleManager {
 
     private List<EditLecture> lessons;
     private static EditSheduleManager editManager;
     private DBManager dbManager;
-    private Context context;
     private boolean moveState;
     private LessonDTO movedLesson;
     private int week;
@@ -38,13 +35,10 @@ public class EditSheduleManager {
     }
 
     public int getWeek() {
-
         return week;
     }
 
     private EditSheduleManager(Context context) {
-        this.context = context;
-        week = 1;
         dbManager = new DBManager(context);
 
     }
@@ -84,8 +78,8 @@ public class EditSheduleManager {
             }
         }*/
 
-        for (int i = 0; i < 5; i++) {
-            for (int j = 0; j < 6; j++) {
+        for (int i = 0; i < Constants.LESSONS_NUMBER; i++) {
+            for (int j = 0; j < Constants.DAYS_NUMBER; j++) {
                 lessons.add(new EditLecture(null, week, j + 1, i + 1));
 
                 if (realLessons.containsKey(j + 1)) {
@@ -105,15 +99,7 @@ public class EditSheduleManager {
         return moveState;
     }
 
-    public void setMoveState(boolean moveState) {
-        this.moveState = moveState;
-    }
-    public LessonDTO getMovedLesson() {
-        return movedLesson;
-    }
-
-
-    public void runMove(int position) {
+    public void startMove(int position) {
         moveState = true;
         movedLesson = lessons.get(position).getLesson();
         lessons.get(position).setLesson(null);

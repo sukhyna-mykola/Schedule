@@ -8,10 +8,6 @@ import com.mykola.schedule.ui.fragments.DayFragment;
 
 import java.util.List;
 
-/**
- * Created by mykola on 16.01.17.
- */
-
 public class PagerAdapter extends FragmentStatePagerAdapter {
     private List<Integer> days;
 

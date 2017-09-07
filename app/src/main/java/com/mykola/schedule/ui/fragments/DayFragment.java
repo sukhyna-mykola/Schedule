@@ -17,18 +17,18 @@ import com.mykola.schedule.data.managers.ScheduleManager;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by mykola on 16.01.17.
- */
 
 public class DayFragment extends Fragment {
+
+    private static final String DAY_NUMBER_KEY = "DAY_NUMBER_KEY";
+
     private RecyclerView.LayoutManager mLayoutManager;
     private RecyclerView.Adapter mAdapter;
     private List<LessonDTO> lessons;
 
     public static DayFragment newInstance(int day) {
         Bundle args = new Bundle();
-        args.putInt(Constants.DAY_NUMBER_KEY,day);
+        args.putInt(DAY_NUMBER_KEY,day);
         DayFragment fragment = new DayFragment();
         fragment.setArguments(args);
         return fragment;
@@ -38,7 +38,7 @@ public class DayFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view =inflater.inflate(R.layout.day_fragment, container, false);
-        int day = getArguments().getInt(Constants.DAY_NUMBER_KEY,0);
+        int day = getArguments().getInt(DAY_NUMBER_KEY,0);
         lessons = ScheduleManager.get(getContext()).getLessons().get(day);
 
         RecyclerView mRecyclerView = (RecyclerView) view.findViewById(R.id.lessons_list);

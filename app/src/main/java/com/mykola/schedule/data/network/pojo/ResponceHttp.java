@@ -5,9 +5,6 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-/**
- * Created by mykola on 01.02.17.
- */
 
 public abstract class ResponceHttp {
     @SerializedName("statusCode")

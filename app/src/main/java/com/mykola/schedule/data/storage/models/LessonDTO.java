@@ -4,10 +4,6 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.mykola.schedule.utils.Constants;
 
-/**
- * Created by mykola on 31.01.17.
- */
-
 public class LessonDTO implements Comparable<LessonDTO> {
 
 

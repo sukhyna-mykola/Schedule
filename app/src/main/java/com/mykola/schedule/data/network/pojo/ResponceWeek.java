@@ -5,10 +5,6 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-/**
- * Created by mykola on 31.01.17.
- */
-
 public class ResponceWeek {
 
     @SerializedName("data")

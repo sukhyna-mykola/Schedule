@@ -15,15 +15,10 @@ import com.mykola.schedule.utils.Constants;
 
 import static com.mykola.schedule.R.id.lesson_building;
 
-/**
- * Created by mykola on 24.03.17.
- */
-
 public abstract class LessonDialogView {
-    private Context context;
 
     private EditText inputLessonName, inputLessonTeather, inputLessonRoom, inputLessonType, inputLessonBuilding;
-    private TextView infoLessonNumber, infoLessonDay, infoLessonWeek, infoLessonTime;
+    private TextView infoLessonNumber, infoLessonDayWeek, infoLessonTime;
     private Dialog dialog;
 
     private View v;
@@ -57,7 +52,6 @@ public abstract class LessonDialogView {
     }
 
     public LessonDialogView(Context context, final EditLecture lecture,String title, int icon) {
-        this.context = context;
         v = LayoutInflater.from(context).inflate(R.layout.dialog_lesson, null);
         inputLessonName = (EditText) v.findViewById(R.id.lesson_name);
         inputLessonBuilding = (EditText) v.findViewById(lesson_building);
@@ -65,29 +59,33 @@ public abstract class LessonDialogView {
         inputLessonType = (EditText) v.findViewById(R.id.lesson_type);
         inputLessonTeather = (EditText) v.findViewById(R.id.lesson_teather);
 
-        infoLessonDay = (TextView) v.findViewById(R.id.lesson_day);
+        infoLessonDayWeek = (TextView) v.findViewById(R.id.lesson_day_week);
         infoLessonNumber = (TextView) v.findViewById(R.id.lesson_number);
         infoLessonTime = (TextView) v.findViewById(R.id.lesson_time);
-        infoLessonWeek = (TextView) v.findViewById(R.id.lesson_week);
 
 
         String[] daysName = context.getResources().getStringArray(R.array.days_of_week);
-        infoLessonDay.setText(daysName[lecture.getDayNumber() - 1]);
-        infoLessonWeek.setText(" , " + String.valueOf(lecture.getWeekNumber()) + context.getString(R.string.th_week));
-        infoLessonNumber.setText(context.getString(R.string.number_lesson) + String.valueOf(lecture.getLessonNumber()));
-        infoLessonTime.setText(context.getString(R.string.time_lesson) + Constants.times.get(lecture.getLessonNumber()));
+        String day = daysName[lecture.getDayNumber() - 1];
+        int week  = lecture.getWeekNumber();
+        int lessonNumber = lecture.getLessonNumber();
+        String time = Constants.times.get(lecture.getLessonNumber());
+
+        infoLessonDayWeek.setText( context.getString(R.string.day_week,day,week));
+        infoLessonNumber.setText(context.getString(R.string.number_lesson,lessonNumber));
+        infoLessonTime.setText(context.getString(R.string.time_lesson, time));
 
         if (lecture.getLesson() != null) {
             inputLessonName.setText(lecture.getLesson().getLessonName());
             inputLessonTeather.setText(lecture.getLesson().getTeacherName());
             inputLessonType.setText(lecture.getLesson().getLessonType());
             try {
-                String[] romm = lecture.getLesson().getLessonRoom().split("-");
-                inputLessonRoom.setText(romm[0]);
-                inputLessonBuilding.setText(romm[1]);
+                String[] room = lecture.getLesson().getLessonRoom().split("-");
+                inputLessonRoom.setText(room[0]);
+                inputLessonBuilding.setText(room[1]);
             } catch (Exception e) {
 
             }
+
         }
         dialog = new AlertDialog.Builder(context)
                 .setView(v)

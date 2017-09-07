@@ -10,19 +10,18 @@ import com.mykola.schedule.data.storage.models.EditLecture;
 import com.mykola.schedule.ui.dialogs.edit.CallbackDialog;
 import com.mykola.schedule.utils.Constants;
 
-/**
- * Created by mykola on 24.03.17.
- */
 
 public abstract class DialogLesson extends DialogFragment {
     protected EditSheduleManager manager;
     protected CallbackDialog update;
 
+    protected static final String LECTURE_POSITION = "LECTURE_POSITION";
+
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         manager = EditSheduleManager.getManager(getActivity());
-        final int position = getArguments().getInt(Constants.LECTURE_POSITION);
+        final int position = getArguments().getInt(LECTURE_POSITION);
 
         return createDialog(position);
     }

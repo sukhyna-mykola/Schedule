@@ -6,9 +6,6 @@ import com.mykola.schedule.data.storage.models.GroupDTO;
 
 import java.util.List;
 
-/**
- * Created by mykola on 31.01.17.
- */
 
 public class ResponceSearchGroups {
 
