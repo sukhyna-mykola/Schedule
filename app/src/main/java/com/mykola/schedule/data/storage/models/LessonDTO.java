@@ -2,22 +2,18 @@ package com.mykola.schedule.data.storage.models;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import com.mykola.schedule.utils.Constants;
 
 public class LessonDTO implements Comparable<LessonDTO> {
 
-
     @SerializedName("day_number")
     @Expose
-    private String dayNumber;
-
+    private int dayNumber;
     @SerializedName("lesson_name")
     @Expose
     private String lessonName;
-
     @SerializedName("lesson_number")
     @Expose
-    private String lessonNumber;
+    private int lessonNumber;
     @SerializedName("lesson_room")
     @Expose
     private String lessonRoom;
@@ -29,58 +25,26 @@ public class LessonDTO implements Comparable<LessonDTO> {
     private String teacherName;
     @SerializedName("lesson_week")
     @Expose
-    private String lessonWeek;
-    @SerializedName("time_start")
-    @Expose
-    private String timeStart;
-    @SerializedName("time_end")
-    @Expose
-    private String timeEnd;
+    private int lessonWeek;
 
 
-    private boolean currentLesson;
-    private boolean currentDay;
-
-    public boolean isCurrentLesson() {
-        return currentLesson;
-    }
-
-    public void setCurrentLesson(boolean currentLesson) {
-        this.currentLesson = currentLesson;
-    }
-
-    public boolean isCurrentDay() {
-        return currentDay;
-    }
-
-    public void setCurrentDay(boolean currentDay) {
-        this.currentDay = currentDay;
-    }
-
-
-    public String getDayNumber() {
+    public int getDayNumber() {
         return dayNumber;
     }
 
-    public void setDayNumber(String dayNumber) {
+    public void setDayNumber(int dayNumber) {
         this.dayNumber = dayNumber;
     }
-
 
     public String getLessonName() {
         return lessonName;
     }
 
-    public void setLessonName(String lessonName) {
-        this.lessonName = lessonName;
-    }
-
-
-    public String getLessonNumber() {
+    public int getLessonNumber() {
         return lessonNumber;
     }
 
-    public void setLessonNumber(String lessonNumber) {
+    public void setLessonNumber(int lessonNumber) {
         this.lessonNumber = lessonNumber;
     }
 
@@ -88,53 +52,25 @@ public class LessonDTO implements Comparable<LessonDTO> {
         return lessonRoom;
     }
 
-    public void setLessonRoom(String lessonRoom) {
-        this.lessonRoom = lessonRoom;
-    }
-
     public String getLessonType() {
         return lessonType;
-    }
-
-    public void setLessonType(String lessonType) {
-        this.lessonType = lessonType;
     }
 
     public String getTeacherName() {
         return teacherName;
     }
 
-    public void setTeacherName(String teacherName) {
-        this.teacherName = teacherName;
-    }
-
-    public String getLessonWeek() {
+    public int getLessonWeek() {
         return lessonWeek;
     }
 
-    public void setLessonWeek(String lessonWeek) {
+    public void setLessonWeek(int lessonWeek) {
         this.lessonWeek = lessonWeek;
-    }
-
-    public String getTimeStart() {
-        return timeStart;
-    }
-
-    public void setTimeStart(String timeStart) {
-        this.timeStart = timeStart;
-    }
-
-    public String getTimeEnd() {
-        return timeEnd;
-    }
-
-    public void setTimeEnd(String timeEnd) {
-        this.timeEnd = timeEnd;
     }
 
 
     public LessonDTO(String lessonName, String lessonType, String teacherName, String lessonRoom,
-                     String lessonNumber, String dayNumber, String lessonWeek) {
+                     int lessonNumber, int dayNumber, int lessonWeek) {
         this.lessonName = lessonName;
         this.lessonType = lessonType;
         this.teacherName = teacherName;
@@ -142,16 +78,11 @@ public class LessonDTO implements Comparable<LessonDTO> {
         this.lessonNumber = lessonNumber;
         this.lessonWeek = lessonWeek;
         this.dayNumber = dayNumber;
-
-        String[] times = Constants.times.get(Integer.parseInt(lessonNumber)).split("-");
-        this.timeStart = times[0];
-        this.timeEnd = times[1];
-
     }
 
 
     @Override
     public int compareTo(LessonDTO o) {
-        return Integer.parseInt(getLessonNumber()) - Integer.parseInt(o.getLessonNumber());
+        return lessonNumber - o.getLessonNumber();
     }
 }

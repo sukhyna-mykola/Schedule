@@ -12,11 +12,17 @@ import android.widget.TextView;
 import com.mykola.schedule.R;
 import com.mykola.schedule.data.managers.ScheduleManager;
 import com.mykola.schedule.data.storage.models.LessonDTO;
+import com.mykola.schedule.utils.Constants;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 public class LessonsAdapter extends RecyclerView.Adapter<LessonsAdapter.ViewHolder> {
-    private ArrayList<LessonDTO> lessons;
+    private List<LessonDTO> lessons;
     private Context context;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -40,7 +46,7 @@ public class LessonsAdapter extends RecyclerView.Adapter<LessonsAdapter.ViewHold
         }
     }
 
-    public LessonsAdapter(ArrayList<LessonDTO> lessonses, Context context) {
+    public LessonsAdapter(List<LessonDTO> lessonses, Context context) {
         this.lessons = lessonses;
         this.context = context;
     }
@@ -55,22 +61,58 @@ public class LessonsAdapter extends RecyclerView.Adapter<LessonsAdapter.ViewHold
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         LessonDTO lesson = lessons.get(position);
-        if (Integer.parseInt(lesson.getLessonWeek()) == ScheduleManager.get(context).getWeekNumber()) {
-            holder.numberLesson.setText(lesson.getLessonNumber());
+        if (lesson.getLessonWeek() == ScheduleManager.get(context).getWeekNumber()) {
+            holder.numberLesson.setText(String.valueOf(lesson.getLessonNumber()));
             holder.roomLesson.setText(lesson.getLessonRoom());
             holder.teatherLesson.setText(lesson.getTeacherName());
             holder.nameLesson.setText(lesson.getLessonName() + "(" + lesson.getLessonType() + ")");
-            holder.timeLesson.setText(lesson.getTimeStart() + " - " + lesson.getTimeEnd());
 
-            if (lesson.isCurrentDay()) {
-                holder.cardView.setCardBackgroundColor(Color.YELLOW);
-            }
-
-            if (lesson.isCurrentLesson()) {
-                holder.cardView.setCardBackgroundColor(Color.GREEN);
-            }
-
+            configureTimeLesson(lesson, holder);
         }
+    }
+
+    private void configureTimeLesson(LessonDTO lesson, ViewHolder holder) {
+
+        String[] times = Constants.times.get(lesson.getLessonNumber()).split("-");
+        String timeStart = times[0];
+        String timeEnd = times[1];
+
+        holder.timeLesson.setText(timeStart + " - " + timeEnd);
+
+        try {
+
+            int currentDay = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1;
+            int currentWeek = ScheduleManager.get(context).getCurrentWeek();
+
+            if (currentDay == lesson.getDayNumber() && currentWeek == lesson.getLessonWeek()) {
+
+                holder.cardView.setCardBackgroundColor(Color.YELLOW);
+
+                if (isLectionNow(timeStart, timeEnd)) {
+                    holder.cardView.setCardBackgroundColor(Color.GREEN);
+                }
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private boolean isLectionNow(String timeStart, String timeEnd) throws ParseException {
+
+        SimpleDateFormat df = new SimpleDateFormat("HH:mm");
+
+        String timeThis = df.format(Calendar.getInstance().getTime());
+
+        Date startTime = df.parse(timeStart);
+        Date endTime = df.parse(timeEnd);
+        Date thisTime = df.parse(timeThis);
+
+        if (thisTime.after(startTime) && thisTime.before(endTime)) {
+            return true;
+        }
+
+        return false;
 
     }
 
@@ -78,6 +120,7 @@ public class LessonsAdapter extends RecyclerView.Adapter<LessonsAdapter.ViewHold
     public int getItemCount() {
         return lessons.size();
     }
+
 }
 
 

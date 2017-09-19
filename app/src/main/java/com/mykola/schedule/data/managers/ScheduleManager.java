@@ -10,11 +10,7 @@ import com.mykola.schedule.data.network.pojo.ResponceWeek;
 import com.mykola.schedule.data.storage.models.LessonDTO;
 import com.mykola.schedule.utils.Constants;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -24,7 +20,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 
-public class ScheduleManager {
+public final class ScheduleManager {
 
     private HashMap<Integer, List<LessonDTO>> lessons;
 
@@ -52,12 +48,12 @@ public class ScheduleManager {
         ServiceBuilder.getApi().getLessons(name).enqueue(new Callback<ResponceLessons>() {
             @Override
             public void onResponse(Call<ResponceLessons> call, Response<ResponceLessons> response) {
-                callbacks.onResponseSheduleFromServer(name, call, response);
+                callbacks.onResponse( call, response);
             }
 
             @Override
             public void onFailure(Call<ResponceLessons> call, Throwable t) {
-                callbacks.onFailureSheduleFromServer(call, t);
+                callbacks.onFailure(call, t);
             }
         });
 
@@ -67,12 +63,12 @@ public class ScheduleManager {
         ServiceBuilder.getApi().getWeek().enqueue(new Callback<ResponceWeek>() {
             @Override
             public void onResponse(Call<ResponceWeek> call, Response<ResponceWeek> response) {
-                callbacks.onResponseWeekFromServer(call, response);
+                callbacks.onResponse(call, response);
             }
 
             @Override
             public void onFailure(Call<ResponceWeek> call, Throwable t) {
-                callbacks.onFailureWeekFromServer(call, t);
+                callbacks.onFailure(call, t);
             }
         });
     }
@@ -89,12 +85,12 @@ public class ScheduleManager {
 
             @Override
             public void onResponse(Call<ResponceSearchGroups> call, Response<ResponceSearchGroups> response) {
-                callbacks.onResponseSearchGroups(call, response);
+                callbacks.onResponse(call, response);
             }
 
             @Override
             public void onFailure(Call<ResponceSearchGroups> call, Throwable t) {
-                callbacks.onFailureSearchGroups(call, t);
+                callbacks.onFailure(call, t);
             }
         });
 
@@ -185,41 +181,6 @@ public class ScheduleManager {
 
     public void loadScheduleOfWeekFromDB() {
         this.lessons = managerDB.readLessonsFromDB(weekNumber);
-        configureLessons();
-    }
-
-    /**
-     * Визначає поточний день та поточну пару
-     */
-    public void configureLessons() {
-
-        Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat df = new SimpleDateFormat("HH:mm");
-
-        int currentDay = calendar.get(Calendar.DAY_OF_WEEK) - 1;
-
-        for (Collection<LessonDTO> tLessons : lessons.values()) {
-            for (LessonDTO lesson : tLessons) {
-                try {
-                    Date startTime = df.parse(lesson.getTimeStart());
-                    Date endTime = df.parse(lesson.getTimeEnd());
-                    Date thisTime = df.parse(df.format(calendar.getTime()));
-
-                    if ((currentDay == Integer.parseInt(lesson.getDayNumber())) &&
-                            (Integer.parseInt(lesson.getLessonWeek()) == currentWeek)) {
-                        if (thisTime.after(startTime) && thisTime.before(endTime)) {
-                            lesson.setCurrentLesson(true);
-                        }
-
-                        lesson.setCurrentDay(true);
-                    }
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-
-            }
-        }
-
     }
 
 

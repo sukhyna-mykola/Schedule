@@ -24,7 +24,7 @@ public class DialogCreate extends DialogLesson {
     @Override
     public Dialog createDialog(int position) {
         final EditLecture lecture = manager.getLessons().get(position);
-        LessonDialogView lessonDialog = new LessonDialogView(getActivity(), lecture,getString(R.string.add_lesson) , R.drawable.ic_add_black_24dp){
+        LessonDialogView lessonDialog = new LessonDialogView(getActivity(), lecture, getString(R.string.add_lesson), R.drawable.ic_add_black_24dp) {
 
             @Override
             public void actionPositiveButton(EditLecture lecture) {
@@ -32,9 +32,9 @@ public class DialogCreate extends DialogLesson {
                 String type = getInputLessonType().getText().toString();
                 String teacher = getInputLessonTeather().getText().toString();
                 String room = getInputLessonRoom().getText().toString() + '-' + getInputLessonBuilding().getText().toString();
-                String number = String.valueOf(lecture.getLessonNumber());
-                String day = String.valueOf(lecture.getDayNumber());
-                String week = String.valueOf(lecture.getWeekNumber());
+                int number = lecture.getLessonNumber();
+                int day = lecture.getDayNumber();
+                int week = lecture.getWeekNumber();
 
                 LessonDTO lesson = new LessonDTO(name, type, teacher, room, number, day, week);
                 lecture.setLesson(lesson);

@@ -14,11 +14,6 @@ public class GroupDTO {
         return groupFullName;
     }
 
-    public void setGroupFullName(String groupFullName) {
-        this.groupFullName = groupFullName;
-    }
-
-
 
 }
 

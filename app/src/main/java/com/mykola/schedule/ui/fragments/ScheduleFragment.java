@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,7 +23,6 @@ import com.mykola.schedule.R;
 import com.mykola.schedule.data.managers.ScheduleManager;
 import com.mykola.schedule.data.network.APICallbacks;
 import com.mykola.schedule.data.network.pojo.ResponceLessons;
-import com.mykola.schedule.data.network.pojo.ResponceSearchGroups;
 import com.mykola.schedule.data.network.pojo.ResponceWeek;
 import com.mykola.schedule.ui.activitys.SearchActivity;
 import com.mykola.schedule.ui.adapters.PagerAdapter;
@@ -42,9 +42,11 @@ import static android.app.Activity.RESULT_OK;
 import static com.mykola.schedule.ui.dialogs.ProgressDialog.DIALOG_PROGRESS;
 
 
-public class ScheduleFragment extends Fragment implements APICallbacks {
+public class ScheduleFragment extends Fragment {
 
     public static final int REQUEST_CODE = 14;
+
+    private final String TAG = getClass().getSimpleName();
 
     private PagerAdapter adapter;
     private TabLayout tabLayout;
@@ -74,7 +76,6 @@ public class ScheduleFragment extends Fragment implements APICallbacks {
         setHasOptionsMenu(true);
 
         manager = ScheduleManager.get(getActivity());
-
     }
 
 
@@ -93,7 +94,6 @@ public class ScheduleFragment extends Fragment implements APICallbacks {
         } else {
             showSearchScreen();
         }
-
         return view;
     }
 
@@ -153,15 +153,6 @@ public class ScheduleFragment extends Fragment implements APICallbacks {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        if (adapter != null && manager.getLessons() != null) {
-            manager.configureLessons();
-            adapter.notifyDataSetChanged();
-        }
-    }
-
-    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         this.menu = menu;
         inflater.inflate(R.menu.menu_schedule, menu);
@@ -216,7 +207,17 @@ public class ScheduleFragment extends Fragment implements APICallbacks {
     private void getSchedule(final String query) {
         if (NetworkStatusChecker.isNetworkAvailable(getContext())) {
             showDialog();
-            manager.getSheduleFromServer(query, this);
+            manager.getSheduleFromServer(query, new APICallbacks() {
+                @Override
+                public void onResponse(Call call, Response response) {
+                    onResponseSheduleFromServer(query, call, response);
+                }
+
+                @Override
+                public void onFailure(Call call, Throwable t) {
+                    onFailureSheduleFromServer(call, t);
+                }
+            });
         } else {
             showToast(getString(R.string.no_internet));
         }
@@ -249,8 +250,7 @@ public class ScheduleFragment extends Fragment implements APICallbacks {
     }
 
 
-    @Override
-    public void onResponseSheduleFromServer(String query, Call<ResponceLessons> call, Response<ResponceLessons> response) {
+    private void onResponseSheduleFromServer(String query, Call<ResponceLessons> call, Response<ResponceLessons> response) {
         if (response.body() != null) {
 
             manager.clearDB();
@@ -266,7 +266,17 @@ public class ScheduleFragment extends Fragment implements APICallbacks {
     private void getWeek() {
 
         if (NetworkStatusChecker.isNetworkAvailable(getContext())) {
-            manager.getWeekFromServer(this);
+            manager.getWeekFromServer(new APICallbacks() {
+                @Override
+                public void onResponse(Call call, Response response) {
+                    onResponseWeekFromServer(call, response);
+                }
+
+                @Override
+                public void onFailure(Call call, Throwable t) {
+                    onFailureWeekFromServer(call, t);
+                }
+            });
         } else {
             showToast(getResources().getString(R.string.no_internet));
             hideDialog();
@@ -285,14 +295,13 @@ public class ScheduleFragment extends Fragment implements APICallbacks {
         }
     }
 
-    @Override
-    public void onFailureSheduleFromServer(Call<ResponceLessons> call, Throwable t) {
+
+    private void onFailureSheduleFromServer(Call<ResponceLessons> call, Throwable t) {
         showToast(getString(R.string.not_found));
         hideDialog();
     }
 
-    @Override
-    public void onResponseWeekFromServer(Call<ResponceWeek> call, Response<ResponceWeek> response) {
+    private void onResponseWeekFromServer(Call<ResponceWeek> call, Response<ResponceWeek> response) {
         manager.saveWeek(response.body().getData());
 
         loadSheduleFromDB();
@@ -300,21 +309,12 @@ public class ScheduleFragment extends Fragment implements APICallbacks {
         hideDialog();
     }
 
-    @Override
-    public void onFailureWeekFromServer(Call<ResponceWeek> call, Throwable t) {
+
+    private void onFailureWeekFromServer(Call<ResponceWeek> call, Throwable t) {
         showToast(getString(R.string.not_found));
         hideDialog();
     }
 
-    @Override
-    public void onResponseSearchGroups(Call<ResponceSearchGroups> call, Response<ResponceSearchGroups> response) {
-
-    }
-
-    @Override
-    public void onFailureSearchGroups(Call<ResponceSearchGroups> call, Throwable t) {
-
-    }
 
     @Override
     public void onAttach(Context context) {

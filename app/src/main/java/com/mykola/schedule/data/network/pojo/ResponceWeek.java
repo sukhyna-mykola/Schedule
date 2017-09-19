@@ -11,7 +11,6 @@ public class ResponceWeek {
     @Expose
     private Integer data;
 
-
     public Integer getData() {
         return data;
     }

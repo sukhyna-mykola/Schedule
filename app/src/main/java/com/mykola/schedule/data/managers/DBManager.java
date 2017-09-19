@@ -7,6 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.mykola.schedule.data.database.DBHelper;
 import com.mykola.schedule.data.storage.models.LessonDTO;
+import com.mykola.schedule.utils.Constants;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -41,7 +43,7 @@ public class DBManager {
 
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        for (int i = 1; i <= 6; i++) {
+        for (int i = 1; i <= Constants.DAYS_NUMBER; i++) {
 
             lessonsOfDay = new ArrayList<>();
 
@@ -65,9 +67,9 @@ public class DBManager {
                     String type = c.getString(typeColIndex);
                     String teacher = c.getString(teacherlColIndex);
                     String room = c.getString(roomColIndex);
-                    String number = c.getString(numberColIndex);
-                    String day = c.getString(dayColIndex);
-                    String week = c.getString(weekColIndex);
+                    int number = c.getInt(numberColIndex);
+                    int day = c.getInt(dayColIndex);
+                    int week = c.getInt(weekColIndex);
 
                     LessonDTO lesson = new LessonDTO(name, type, teacher, room, number, day, week);
                     lessonsOfDay.add(lesson);
@@ -123,7 +125,7 @@ public class DBManager {
     public void removeLessonFromDB(LessonDTO lesson) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.delete(TABLE_NAME,LESSON_WEEK+"=? AND "+DAY_NUMBER +
-                "=? AND "+LESSON_NUMBER+"=?",new String[]{lesson.getLessonWeek(),lesson.getDayNumber(),lesson.getLessonNumber()});
+                "=? AND "+LESSON_NUMBER+"=?",new String[]{String.valueOf(lesson.getLessonWeek()),String.valueOf(lesson.getDayNumber()), String.valueOf(lesson.getLessonNumber())});
         db.close();
     }
 
@@ -144,7 +146,7 @@ public class DBManager {
         cv.put(LESSON_WEEK, lesson.getLessonWeek());
 
         db.update(TABLE_NAME,cv,LESSON_WEEK+"=? AND "+DAY_NUMBER +
-                "=? AND "+LESSON_NUMBER+"=?",new String[]{lesson.getLessonWeek(),lesson.getDayNumber(),lesson.getLessonNumber()});
+                "=? AND "+LESSON_NUMBER+"=?",new String[]{String.valueOf(lesson.getLessonWeek()),String.valueOf(lesson.getDayNumber()), String.valueOf(lesson.getLessonNumber())});
         db.close();
     }
 }

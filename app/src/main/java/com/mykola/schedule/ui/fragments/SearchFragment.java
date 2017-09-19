@@ -36,7 +36,7 @@ import static android.app.Activity.RESULT_OK;
 
 
 public class SearchFragment extends Fragment implements View.OnClickListener,
-        AdapterView.OnItemClickListener, APICallbacks {
+        AdapterView.OnItemClickListener {
 
     private EditText groupNameInputField;
     private ProgressBar progressBar;
@@ -61,7 +61,17 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
         public void onTextChanged(CharSequence s, int start, int before, int count) {
             after = s.length();
             if (s.length() > 0)
-                manager.searchGroups(String.valueOf(s), SearchFragment.this);
+                manager.searchGroups(String.valueOf(s), new APICallbacks() {
+                    @Override
+                    public void onResponse(Call call, Response response) {
+                        onResponseSearchGroups(call, response);
+                    }
+
+                    @Override
+                    public void onFailure(Call call, Throwable t) {
+                        onFailureSearchGroups(call, t);
+                    }
+                });
         }
 
         @Override
@@ -162,14 +172,23 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
             itemList.setVisibility(View.GONE);
             progressBar.setVisibility(View.VISIBLE);
             // get Schedule
-            manager.getSheduleFromServer(query, this);
+            manager.getSheduleFromServer(query, new APICallbacks() {
+                @Override
+                public void onResponse(Call call, Response response) {
+                    onResponseSheduleFromServer(query, call, response);
+                }
+
+                @Override
+                public void onFailure(Call call, Throwable t) {
+                    onFailureSheduleFromServer(call, t);
+                }
+            });
         } else {
             Toast.makeText(getActivity(), R.string.no_internet, Toast.LENGTH_SHORT).show();
         }
     }
 
-    @Override
-    public void onResponseSheduleFromServer(String query, Call<ResponceLessons> call, Response<ResponceLessons> response) {
+    private void onResponseSheduleFromServer(String query, Call<ResponceLessons> call, Response<ResponceLessons> response) {
         if (response.body() != null) {
             manager.clearDB();
             manager.putLessonsIntoDB(response.body().getData());
@@ -184,13 +203,21 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
 
         if (NetworkStatusChecker.isNetworkAvailable(getContext())) {
             // get WeekNumber
-            manager.getWeekFromServer(this);
+            manager.getWeekFromServer(new APICallbacks() {
+                @Override
+                public void onResponse(Call call, Response response) {
+                    onResponseWeekFromServer(call, response);
+                }
+
+                @Override
+                public void onFailure(Call call, Throwable t) {
+                    onFailureWeekFromServer(call, t);
+                }
+            });
         } else {
             Toast.makeText(getActivity(), R.string.no_internet, Toast.LENGTH_SHORT).show();
         }
     }
-
-
 
 
     private void notFound() {
@@ -200,13 +227,11 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
         itemList.setVisibility(View.VISIBLE);
     }
 
-    @Override
-    public void onFailureSheduleFromServer(Call<ResponceLessons> call, Throwable t) {
+    private void onFailureSheduleFromServer(Call<ResponceLessons> call, Throwable t) {
         notFound();
     }
 
-    @Override
-    public void onResponseWeekFromServer(Call<ResponceWeek> call, Response<ResponceWeek> response) {
+    private void onResponseWeekFromServer(Call<ResponceWeek> call, Response<ResponceWeek> response) {
         if (response.body() != null) {
             manager.saveWeek(response.body().getData());
             manager.logIn();
@@ -224,13 +249,11 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
         getActivity().finish();
     }
 
-    @Override
-    public void onFailureWeekFromServer(Call<ResponceWeek> call, Throwable t) {
+    private void onFailureWeekFromServer(Call<ResponceWeek> call, Throwable t) {
         notFound();
     }
 
-    @Override
-    public void onResponseSearchGroups(Call<ResponceSearchGroups> call, Response<ResponceSearchGroups> response) {
+    private void onResponseSearchGroups(Call<ResponceSearchGroups> call, Response<ResponceSearchGroups> response) {
 
         List<String> result = new ArrayList<String>();
 
@@ -243,8 +266,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener,
         listAdapter.addAll(result);
     }
 
-    @Override
-    public void onFailureSearchGroups(Call<ResponceSearchGroups> call, Throwable t) {
+    private void onFailureSearchGroups(Call<ResponceSearchGroups> call, Throwable t) {
         listAdapter.clear();
     }
 }

@@ -7,7 +7,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.mykola.schedule.data.storage.models.LessonDTO;
 
-public class ResponceLessons extends ResponceHttp {
+public class ResponceLessons  {
 
     @SerializedName("data")
     @Expose

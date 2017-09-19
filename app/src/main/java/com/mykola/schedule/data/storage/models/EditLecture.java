@@ -29,24 +29,13 @@ public class EditLecture {
         return dayNumber;
     }
 
-    public void setDayNumber(int dayNumber) {
-        this.dayNumber = dayNumber;
-    }
-
     public int getWeekNumber() {
         return weekNumber;
-    }
-
-    public void setWeekNumber(int weekNumber) {
-        this.weekNumber = weekNumber;
     }
 
     public int getLessonNumber() {
         return lessonNumber;
     }
 
-    public void setLessonNumber(int lessonNumber) {
-        this.lessonNumber = lessonNumber;
-    }
 
 }

@@ -54,29 +54,7 @@ public class EditSheduleManager {
     }
 
     private void generateLessons(HashMap<Integer, List<LessonDTO>> realLessons) {
-
         lessons = new ArrayList<>();
-       /* for (int i = 0; i < 6; i++) {
-            if (manager.getLessons().containsKey(i)) {
-
-                List<LessonDTO> tmpLessons = manager.getLessons().get(i);
-
-                for (int j = 0; j < 5; j++) {
-                    lessons.add(new EditLecture(null, 1, i, j));
-
-                    for (LessonDTO tmpLesson : tmpLessons) {
-                        if (Integer.parseInt(tmpLesson.getLessonNumber()) == j) {
-                            lessons.get(lessons.size() - 1).setLesson(tmpLesson);
-                            break;
-                        }
-                    }
-                }
-            } else {
-                for (int j = 0; j < 5; j++) {
-                    lessons.add(new EditLecture(null, 1, i, j));
-                }
-            }
-        }*/
 
         for (int i = 0; i < Constants.LESSONS_NUMBER; i++) {
             for (int j = 0; j < Constants.DAYS_NUMBER; j++) {
@@ -85,7 +63,7 @@ public class EditSheduleManager {
                 if (realLessons.containsKey(j + 1)) {
                     List<LessonDTO> tmpLessons = realLessons.get(j + 1);
                     for (LessonDTO tmpLesson : tmpLessons) {
-                        if (Integer.parseInt(tmpLesson.getLessonNumber()) == i + 1) {
+                        if (tmpLesson.getLessonNumber() == i + 1) {
                             lessons.get(lessons.size() - 1).setLesson(tmpLesson);
                             break;
                         }
@@ -112,9 +90,9 @@ public class EditSheduleManager {
         dbManager.removeLessonFromDB(movedLesson);
 
         EditLecture newLecture = lessons.get(position);
-        movedLesson.setDayNumber(String.valueOf(newLecture.getDayNumber()));
-        movedLesson.setLessonWeek(String.valueOf(newLecture.getWeekNumber()));
-        movedLesson.setLessonNumber(String.valueOf(newLecture.getLessonNumber()));
+        movedLesson.setDayNumber(newLecture.getDayNumber());
+        movedLesson.setLessonWeek(newLecture.getWeekNumber());
+        movedLesson.setLessonNumber(newLecture.getLessonNumber());
 
         dbManager.putLessonIntoDB(movedLesson);
         lessons.get(position).setLesson(movedLesson);
